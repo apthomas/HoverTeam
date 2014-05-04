@@ -14,7 +14,7 @@ public class Physics {
 	 * The latest GameState.
 	 * @see Req 3.2.1.1.1
 	 */
-	private GameState gs;
+	//private GameState gs;
 	/**
 	 * The last time the state was updated.
 	 * Measured in seconds from the game start.
@@ -60,7 +60,8 @@ public class Physics {
 		/* Generate a system of forces and torques on the vehicle. 
 		 * Req 3.2.1.3.1.
 		 */
-		
+		double forces[] = getForces(controls);
+		double torque = getTorque(controls);
 		/* Update the state of the vehicle, 
 		 * using a model of the vehicle dynamics and the applied forces/torques
 		 * Req 3.2.1.3.1
@@ -72,29 +73,45 @@ public class Physics {
 		 */
 	}
 	
+	 
+	
 	/**
-	 * Compute the forces on the vehicle, given control input.
+	 * Compute the forces on the vehicle exerted on the vehicle by
+	 * gravity and thrusters, given control input.
 	 * @param controls Indicates which thrusters are on (true=on).
 	 * @return The forces (Fx, Fy) on the vehicle in the world frame [Newtons].
 	 */
 	double[] getForces(boolean controls[]){
 		double[] F = {0,0};
+		// Thruster force
+		double theta = 0; //TODO
 		for(boolean on : controls){
 			if(on) {
-				F[0] += Math.sin(theta) * F_thruster;
+				F[0] += -Math.sin(theta) * F_thruster;
 				F[1] += Math.cos(theta) * F_thruster;
 			}
 		}
+		// Gravity force
+		F[1] += -g*m;
 		return F;
 	}
 	
 	/**
-	 * Compute the torque on the vehicle, given control input.
-	 * @param controls Indicates which thrusters are on (true=on).
+	 * Compute the torque exerted on the vehicle by the thrusters,
+	 *  given a control input which indicates which thrusters are on.
+	 * Positive torques produce counterclockwise rotation.
+	 * @param controls IIf the ith value fo this array is true, the ith thruster is on.
 	 * @return The torque on the vehicle [Newton meters].
 	 */
 	double getTorque(boolean controls[]){
-		
+		double[][] thruster_pos = Physics.getThrusterPositions(controls.length);
+		double torque = 0;
+		for(int i=0; i<controls.length; i++) {
+			if(controls[i]) {
+				torque += F_thruster * thruster_pos[i][0];
+			}
+		}
+		return torque;
 	}
 	
 	/**
@@ -103,14 +120,14 @@ public class Physics {
 	 * @return The thruster positions relative to the vehicle center 
 	 * in the vehicle frame [meters].
 	 */
-	public double[][] getThrusterPositions(int n){
+	public static double[][] getThrusterPositions(int n){
 		if(n<1){
 			throw new IllegalArgumentException(
 					"The number of thusters must be an integer greater than 0.");
 		}
 		double thruster_pos[][] = new double[n][2];
 		for(int i = 0; i < n; i++) {
-			thruster_pos[i][0] = (i-Math.floor(n/2)) * Physics.length/2;
+			thruster_pos[i][0] = (i-Math.floor(n/2))/(Math.floor(n/2)) * Physics.length/2;
 			thruster_pos[i][1] = -Physics.height/2;
 		}
 		return thruster_pos;
