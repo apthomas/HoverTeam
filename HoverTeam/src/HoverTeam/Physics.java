@@ -14,7 +14,7 @@ public class Physics {
 	 * The latest GameState.
 	 * @see Req 3.2.1.1.1
 	 */
-	//private GameState gs;
+	private GameState state;
 	/**
 	 * The last time the state was updated.
 	 * Measured in seconds from the game start.
@@ -28,6 +28,7 @@ public class Physics {
 	 * The vehicle mass [kilograms].
 	 */
 	public final double m = 1;
+	
 	/**
 	 * The acceleration due to gravity [meters/second^2].
 	 */
@@ -39,7 +40,12 @@ public class Physics {
 	/**
 	 * The Vehicle height [meters].
 	 */
-	public static final double height = 1;
+	public static final double height = 1;	
+	/**
+	 * The vehicle moment of inertia [kg m^2]
+	 * Assume the vehicle mass is uniformly distributed along its length.
+	 */
+	public final double I = m*length*length/12;
 	
 	/**
 	 * Constructor.
@@ -56,7 +62,7 @@ public class Physics {
 	 * @param time
 	 * @param controls
 	 */
-	public void UpdateState(double time, boolean controls[]){
+	public GameState updateState(GameState state, boolean controls[]){
 		/* Generate a system of forces and torques on the vehicle. 
 		 * Req 3.2.1.3.1.
 		 */
@@ -66,14 +72,37 @@ public class Physics {
 		 * using a model of the vehicle dynamics and the applied forces/torques
 		 * Req 3.2.1.3.1
 		 */
-		
+		GameState new_state = dynamics(state, forces, torque);
 		/* Check if the current position of the vehicle is in
 		 * collision with an obstacle.
 		 * Req 3.2.1.3.4
 		 */
-	}
+		state.checkCollisions();
+		// record the time for the last state update
+		t_last = state.getTime();
+		return state;
+	}	
 	
-	 
+	GameState dynamics(GameState state, double[] forces, double torque) {
+		double dt = state.getTime() - t_last;
+		// Linear 
+		double[] accel = {0,0};
+		double[] vel = state.getVelocity();
+		double[] pos = state.getPosition();
+		for(int i=0; i<2; i++){
+			accel[i] = forces[i] / m;
+			vel[i] += accel[i] * dt;
+			pos[i] += vel[i] * dt;
+		}
+		// Angular
+		double ang_accel = torque / I;
+		vel[2] += ang_accel * dt;
+		pos[2] += vel[2] * dt;
+		
+		state.setPosition(pos);
+		state.setVelocity(vel);
+		return state;
+	}
 	
 	/**
 	 * Compute the forces on the vehicle exerted on the vehicle by

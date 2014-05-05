@@ -3,16 +3,22 @@
  * 16.35 Spring 2014 Final Project
  * @author Aaron Thomas and Matt Vernacchia
  */
+package HoverTeam;
+
 import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
-package HoverTeam;
+
 
 public class GameState {
 	private double x, y, theta;	/*Shared resource*/
 	private double x_dot, y_dot, theta_dot;	/*Shared resource*/
 	private int n_players;
+	/**
+	 * The time since the game start [seconds].
+	 */
+	private double t;
 	
 	/* near obstacles list */
 	private int[] near_obst_heights;
@@ -25,22 +31,27 @@ public class GameState {
 	private final int num_heights_in_near_list=4;
 	private final int obstacle_width=5;
 	
-	public GameState(double[] position, double[] velocity, int nPlayers, int[] nearObstHeights, int nearObstIndex){
+	public GameState(double[] position, double[] velocity, double time, int nPlayers, int[] nearObstHeights, int nearObstIndex){
 		if (position.length != 3)
 		      throw new IllegalArgumentException("Positon array must be of length 3"); 
 		if (velocity.length != 3)
 		      throw new IllegalArgumentException("Velocity array must be of length 3"); 
-		x=position[0];
-		y=position[1];
-		theta=position[2];
+		setPosition(position);
 		
-		x_dot = velocity[0];
-		y_dot=velocity[1];
-		theta_dot = velocity[2];
+		setVelocity(velocity);
+		t = time;
 		n_players = nPlayers;
 		near_obst_heights = nearObstHeights;
 		near_obst_start_i = nearObstIndex;
 		gameOutcome = true;	
+	}
+	synchronized public void setTime(double new_time) {
+		if(t>0) {
+			t = new_time;
+		}
+	}
+	synchronized public double getTime() {
+		return t;
 	}
 	synchronized public void setPosition(double[] newPosition) {
 	    if (newPosition.length != 3)
@@ -101,7 +112,11 @@ public class GameState {
 			nearList[i-near_obst_start_i]=allObstaclesList[i];
 		}
 	}
-	private void checkCollisions(){
+	/**
+	 * Checks if the vechile is in collision with an obstacle.
+	 * If the vehicle is in collision, gameOutcome is set to false.
+	 */
+	public void checkCollisions(){
 		double vehicWidth=Physics.length;
 		double vehicHeight= Physics.height;
 		/*
