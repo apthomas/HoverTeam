@@ -6,5 +6,16 @@
 package HoverTeam;
 
 public class GameServer {
-
+	/** 
+	 * The state of the game.
+	 */
+	private GameState state;
+	
+	public Gameserver() {
+		
+	}
+	
+	public sychronized void setState() {
+		
+	}
 }

@@ -78,13 +78,14 @@ public class Physics {
 		 * Req 3.2.1.3.4
 		 */
 		state.checkCollisions();
-		// record the time for the last state update
-		t_last = state.getTime();
 		return state;
 	}	
 	
 	GameState dynamics(GameState state, double[] forces, double torque) {
 		double dt = state.getTime() - t_last;
+		// record the time for the last state update
+		t_last = state.getTime();
+		//System.out.println(dt);
 		// Linear 
 		double[] accel = {0,0};
 		double[] vel = state.getVelocity();
