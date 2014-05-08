@@ -175,7 +175,7 @@ public class GameState {
 
 		for (int i=0; i<near_obst_heights.length;i++){
 			Rectangle2D.Double rectangle = new Rectangle2D.Double(
-					(near_obst_start_i+1)*obstacle_spacing, //x top left corner
+					(near_obst_start_i+i)*obstacle_spacing, //x top left corner
 					near_obst_heights[i], //y top left corner
 					obstacle_width,  //w
 					near_obst_heights[i] //h

@@ -15,7 +15,6 @@ import org.junit.Test;
  *
  */
 public class TestGameState {
-	GameState state;
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -29,7 +28,7 @@ public class TestGameState {
 		int nearObstIndex = 0;
 		double[] pos = {5, 5, 0};
 		double[] vel = {0, 0, 0};
-		state = new GameState(pos, vel, 0, 0, nearObstHeights, nearObstIndex);
+		GameState state = new GameState(pos, vel, 0, 0, nearObstHeights, nearObstIndex);
 		state.checkCollisions();
 		assertTrue(state.getGameOutcome());
 	}
@@ -39,7 +38,7 @@ public class TestGameState {
 		int nearObstIndex = 0;
 		double[] pos = {0, 5, 0};
 		double[] vel = {0, 0, 0};
-		state = new GameState(pos, vel, 0, 0, nearObstHeights, nearObstIndex);
+		GameState state = new GameState(pos, vel, 0, 0, nearObstHeights, nearObstIndex);
 		state.checkCollisions();
 		assertFalse(state.getGameOutcome());
 	}
