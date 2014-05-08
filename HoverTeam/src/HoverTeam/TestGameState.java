@@ -7,6 +7,9 @@ package HoverTeam;
 
 import static org.junit.Assert.*;
 
+import java.awt.geom.Path2D;
+import java.awt.geom.Rectangle2D;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,7 +24,7 @@ public class TestGameState {
 	@Before
 	public void setUp() throws Exception {
 	}
-
+	
 	@Test
 	public void test_checkCollisions_noCollision() {
 		int[] nearObstHeights = {1,1,1,1};
@@ -41,6 +44,42 @@ public class TestGameState {
 		GameState state = new GameState(pos, vel, 0, 0, nearObstHeights, nearObstIndex);
 		state.checkCollisions();
 		assertFalse(state.getGameOutcome());
+	}
+	@Test
+	public void test_testInteresction_no_rect() {
+		Rectangle2D.Double a = new Rectangle2D.Double(0,0,1,1);
+		Rectangle2D.Double b = new Rectangle2D.Double(2,2,1,1);
+		assertFalse(GameState.testIntersection(a, b));
+	}
+	@Test
+	public void test_testInteresction_yes_rect() {
+		Rectangle2D.Double a = new Rectangle2D.Double(0,0,1,1);
+		Rectangle2D.Double b = new Rectangle2D.Double(-1,-1,1.5,1.5);
+		assertTrue(GameState.testIntersection(a, b));
+	}
+	@Test
+	public void test_testInteresction_no_path() {
+		Rectangle2D.Double a = new Rectangle2D.Double(0,0,1,1);
+		Path2D.Double p = new Path2D.Double();
+		p.moveTo(1.5, 1.5);
+		p.lineTo(1.5, 2.5);
+		p.lineTo(2.5, 2.5);
+		p.lineTo(2.5, 1.5);
+		p.lineTo(1.5, 1.5);
+		p.closePath();
+		assertFalse(GameState.testIntersection(a, p));
+	}
+	@Test
+	public void test_testInteresction_yes_path() {
+		Rectangle2D.Double a = new Rectangle2D.Double(0,0,1,1);
+		Path2D.Double p = new Path2D.Double();
+		p.moveTo(0.5, 0.5);
+		p.lineTo(0.5, 1.5);
+		p.lineTo(1.5, 1.5);
+		p.lineTo(1.5, 0.5);
+		p.lineTo(0.5, 0.5);
+		p.closePath();
+		assertTrue(GameState.testIntersection(a, p));
 	}
 
 }

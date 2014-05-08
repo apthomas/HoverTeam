@@ -5,6 +5,7 @@
  */
 package HoverTeam;
 
+import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
@@ -121,10 +122,30 @@ public class GameState {
 		}
 	}
 	/**
-	 * Checks if the vechile is in collision with an obstacle.
+	 * Checks if the vehicle is in collision with an obstacle.
 	 * If the vehicle is in collision, gameOutcome is set to false.
 	 */
 	public void checkCollisions(){
+		Path2D currentVehic = getVehicleShapePath();
+
+		for (int i=0; i<near_obst_heights.length;i++){
+			Rectangle2D.Double rectangle = new Rectangle2D.Double(
+					(near_obst_start_i+i)*obstacle_spacing, //x top left corner
+					near_obst_heights[i], //y top left corner
+					obstacle_width,  //w
+					near_obst_heights[i] //h
+					);
+			if (testIntersection(currentVehic, rectangle))
+				gameOutcome=false;	//you lose.
+		}
+	}
+	
+	/**
+	 * Gets a Path2D which represents the perimeter of the vehicle in
+	 * the world reference frame.
+	 * @return
+	 */
+	public Path2D.Double getVehicleShapePath() {
 		double vehicWidth=Physics.length;
 		double vehicHeight= Physics.height;
 		/*
@@ -164,7 +185,6 @@ public class GameState {
 		yPoints[2] =bottomLeft[1];
 		yPoints[3] = bottomRight[1];
 
-		//Polygon currentVehic = new Polygon(xPoints, yPoints, 4);
 		Path2D.Double currentVehic = new Path2D.Double();
 		currentVehic.moveTo(topLeft[0], topLeft[1]);
 		currentVehic.lineTo(topRight[0], topRight[1]);
@@ -172,18 +192,7 @@ public class GameState {
 		currentVehic.lineTo(bottomLeft[0], bottomLeft[1]);
 		currentVehic.lineTo(topLeft[0], topLeft[1]);
 		currentVehic.closePath();
-
-		for (int i=0; i<near_obst_heights.length;i++){
-			Rectangle2D.Double rectangle = new Rectangle2D.Double(
-					(near_obst_start_i+i)*obstacle_spacing, //x top left corner
-					near_obst_heights[i], //y top left corner
-					obstacle_width,  //w
-					near_obst_heights[i] //h
-					);
-			boolean result= testIntersection(currentVehic, rectangle);
-			if (result==false)
-				gameOutcome=false;	//you lose.
-		}
+		return currentVehic;
 	}
 	private double[] computeCornerOfRect(double xCorner, double yCorner){
 		double sinTheta=Math.sin(theta);
@@ -195,10 +204,17 @@ public class GameState {
 		cornerRect[1]= newY;
 		return cornerRect;
 	}
+	
+	/**
+	 * Returns true if the two shapes intersect.
+	 * @param shape1
+	 * @param shape2
+	 * @return
+	 */
 	public static boolean testIntersection(Shape shape1, Shape shape2){
 		Area a1 = new Area(shape1);
 		a1.intersect(new Area(shape2));
-		return a1.isEmpty();
+		return !a1.isEmpty();
 	}
 
 }
