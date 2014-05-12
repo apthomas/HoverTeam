@@ -7,6 +7,7 @@ package HoverTeam;
 
 import java.awt.Polygon;
 import java.awt.Shape;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
@@ -126,20 +127,44 @@ public class GameState {
 	 * If the vehicle is in collision, gameOutcome is set to false.
 	 */
 	public void checkCollisions(){
+		// Get the vehicle perimeter shape
 		Path2D currentVehic = getVehicleShapePath();
 
+		// Check collisions between the vehicle shape path and the obstacles 
 		for (int i=0; i<near_obst_heights.length;i++){
 			Rectangle2D.Double rectangle = new Rectangle2D.Double(
-					(near_obst_start_i+i)*obstacle_spacing, //x top left corner
-					near_obst_heights[i], //y top left corner
-					obstacle_width,  //w
-					near_obst_heights[i] //h
+					(near_obst_start_i+i)*obstacle_spacing, //x bottom left corner
+					0, //y bottom left corner
+					obstacle_width,  //width
+					near_obst_heights[i] //height
 					);
-			if (testIntersection(currentVehic, rectangle))
+			if (testIntersection(currentVehic, rectangle)) {
 				gameOutcome=false;	//you lose.
+			}
+		}
+
+		// Check collisions between the vehicle and the ceiling
+		Rectangle2D.Double ceiling = new Rectangle2D.Double(
+				(near_obst_start_i-2)*obstacle_spacing, //x bottom left corner
+				10, //y bottom left corner
+				obstacle_spacing*(near_obst_heights.length+4),  //width
+				1 //height
+				);
+		if (testIntersection(currentVehic, ceiling)) {
+			gameOutcome=false;	//you lose.
+		}
+		// Check collisions between the vehicle and the floor
+		Rectangle2D.Double floor = new Rectangle2D.Double(
+				(near_obst_start_i-2)*obstacle_spacing, //x bottom left corner
+				-1, //y bottom left corner
+				obstacle_spacing*(near_obst_heights.length+4),  //width
+				1 //height
+				);
+		if (testIntersection(currentVehic, floor)) {
+			gameOutcome=false;	//you lose.
 		}
 	}
-	
+
 	/**
 	 * Gets a Path2D which represents the perimeter of the vehicle in
 	 * the world reference frame.
@@ -167,7 +192,7 @@ public class GameState {
 
 		bottomRight[0]=x+vehicWidth/2;
 		bottomRight[1]= y+vehicHeight/2;
-
+		/*
 		topLeft=computeCornerOfRect(topLeft[0], topLeft[1]);
 		topRight=computeCornerOfRect(topRight[0], topRight[1]);
 		bottomLeft=computeCornerOfRect(bottomLeft[0], bottomLeft[1]);
@@ -184,7 +209,8 @@ public class GameState {
 		yPoints[1]=topRight[1];
 		yPoints[2] =bottomLeft[1];
 		yPoints[3] = bottomRight[1];
-
+		 */
+		// Make the non-rotated vehicle perimeter
 		Path2D.Double currentVehic = new Path2D.Double();
 		currentVehic.moveTo(topLeft[0], topLeft[1]);
 		currentVehic.lineTo(topRight[0], topRight[1]);
@@ -192,6 +218,11 @@ public class GameState {
 		currentVehic.lineTo(bottomLeft[0], bottomLeft[1]);
 		currentVehic.lineTo(topLeft[0], topLeft[1]);
 		currentVehic.closePath();
+		// Rotate the vehicle perimeter about its center
+		AffineTransform rotate = new AffineTransform();
+		rotate.setToRotation(theta, x, y);
+		currentVehic.transform(rotate);
+
 		return currentVehic;
 	}
 	private double[] computeCornerOfRect(double xCorner, double yCorner){
@@ -204,7 +235,7 @@ public class GameState {
 		cornerRect[1]= newY;
 		return cornerRect;
 	}
-	
+
 	/**
 	 * Returns true if the two shapes intersect.
 	 * @param shape1

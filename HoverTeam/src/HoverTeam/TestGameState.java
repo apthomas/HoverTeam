@@ -27,7 +27,7 @@ public class TestGameState {
 	
 	@Test
 	public void test_checkCollisions_noCollision() {
-		int[] nearObstHeights = {1,1,1,1};
+		int[] nearObstHeights = {1};
 		int nearObstIndex = 0;
 		double[] pos = {5, 5, 0};
 		double[] vel = {0, 0, 0};
@@ -40,6 +40,25 @@ public class TestGameState {
 		int[] nearObstHeights = {10};
 		int nearObstIndex = 0;
 		double[] pos = {0, 5, 0};
+		double[] vel = {0, 0, 0};
+		GameState state = new GameState(pos, vel, 0, 0, nearObstHeights, nearObstIndex);
+		state.checkCollisions();
+		assertFalse(state.getGameOutcome());
+	}
+	@Test
+	public void test_checkCollisions_collision_floor() {
+		int[] nearObstHeights = {1};
+		int nearObstIndex = 0;
+		double[] pos = {2, 0, 0};
+		double[] vel = {0, 0, 0};
+		GameState state = new GameState(pos, vel, 0, 0, nearObstHeights, nearObstIndex);
+		state.checkCollisions();
+		assertFalse(state.getGameOutcome());
+	}
+	public void test_checkCollisions_collision_ceiling() {
+		int[] nearObstHeights = {1};
+		int nearObstIndex = 0;
+		double[] pos = {2, 10, 0};
 		double[] vel = {0, 0, 0};
 		GameState state = new GameState(pos, vel, 0, 0, nearObstHeights, nearObstIndex);
 		state.checkCollisions();
@@ -81,5 +100,43 @@ public class TestGameState {
 		p.closePath();
 		assertTrue(GameState.testIntersection(a, p));
 	}
-
+	@Test
+	public void test_getVehicleShapePath() {
+		int[] nearObstHeights = {10};
+		int nearObstIndex = 0;
+		double[] pos = {0, 5, 0};
+		double[] vel = {0, 0, 0};
+		GameState state = new GameState(pos, vel, 0, 0, nearObstHeights, nearObstIndex);
+		Path2D.Double p = state.getVehicleShapePath();
+		Rectangle2D bounds = p.getBounds2D();
+		assertEquals(pos[0]-Physics.length/2, bounds.getMinX(), 1e-6);
+		assertEquals(pos[0]+Physics.length/2, bounds.getMaxX(), 1e-6);
+		assertEquals(pos[1]-Physics.height/2, bounds.getMinY(), 1e-6);
+		assertEquals(pos[1]+Physics.height/2, bounds.getMaxY(), 1e-6);
+	}
+	@Test
+	public void test_getVehicleShapePath_rotated() {
+		int[] nearObstHeights = {10};
+		int nearObstIndex = 0;
+		double[] pos = {0, 5, Math.PI/2};
+		double[] vel = {0, 0, 0};
+		GameState state = new GameState(pos, vel, 0, 0, nearObstHeights, nearObstIndex);
+		Path2D.Double p = state.getVehicleShapePath();
+		Rectangle2D bounds = p.getBounds2D();
+		assertEquals(pos[0]-Physics.height/2, bounds.getMinX(), 1e-6);
+		assertEquals(pos[0]+Physics.height/2, bounds.getMaxX(), 1e-6);
+		assertEquals(pos[1]-Physics.length/2, bounds.getMinY(), 1e-6);
+		assertEquals(pos[1]+Physics.length/2, bounds.getMaxY(), 1e-6);
+	}
+	@Test
+	public void test_getVehicleShapePath_intersect() {
+		int[] nearObstHeights = {10};
+		int nearObstIndex = 0;
+		double[] pos = {0, 5, 0};
+		double[] vel = {0, 0, 0};
+		GameState state = new GameState(pos, vel, 0, 0, nearObstHeights, nearObstIndex);
+		Path2D.Double p = state.getVehicleShapePath();
+		Rectangle2D.Double a = new Rectangle2D.Double(0,0,1,10);
+		assertTrue(GameState.testIntersection(p, a));
+	}
 }

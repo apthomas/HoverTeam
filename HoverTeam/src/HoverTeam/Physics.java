@@ -9,12 +9,11 @@ package HoverTeam;
  * The physics engine for the game.
  * @see Req 3.2.1
  */
-public class Physics {
+public class Physics implements Runnable{
 	/**
-	 * The latest GameState.
-	 * @see Req 3.2.1.1.1
+	 * Reference to the GameServer
 	 */
-	private GameState state;
+	GameServer server;
 	/**
 	 * The last time the state was updated.
 	 * Measured in seconds from the game start.
@@ -46,12 +45,17 @@ public class Physics {
 	 * Assume the vehicle mass is uniformly distributed along its length.
 	 */
 	public final double I = m*length*length/12;
+	/**
+	 * The timestep between physics updates [seconds]
+	 */
+	public final double timestep = 1e-2;
 	
 	/**
 	 * Constructor.
 	 * @see Req 3.2.1.2
 	 */
-	public Physics() {
+	public Physics( GameServer server ) {
+		this.server = server;
 	}
 	
 	/**
@@ -161,6 +165,43 @@ public class Physics {
 			thruster_pos[i][1] = -Physics.height/2;
 		}
 		return thruster_pos;
+	}
+
+	@Override
+	public void run() {
+		// Record the start time.
+		double t_start_abs = System.nanoTime()*1e-9;
+		// Run the physics until the player(s) lose.
+		GameState state = server.getState();
+		while(state.getGameOutcome()) {
+			// Get the latest GameState from the server
+			state = server.getState();
+			// Record the time at which this cycle started, relative to the start of the game.
+			double t_cycle_start = System.nanoTime()*1e-9 - t_start_abs;
+			System.out.println(String.format("t_cycle_start=%.6fs", t_cycle_start));
+			state.setTime(t_cycle_start);
+			// Get the latest control inputs from the GameServer
+			boolean[] controls = server.getControls();
+			// Update the GameState
+			state = updateState(state, controls);
+			// push the new GameState to the server
+			server.setState(state);
+			
+			// Sleep until the next cycle
+			double t_spent = (System.nanoTime()*1e-9 - t_start_abs) - t_cycle_start;
+			double t_sleep = timestep - t_spent;
+			System.out.println(String.format("t_sleep=%.3fms", t_sleep*1000));
+			if(t_sleep > 0) {
+				try {
+					long t_sleep_millis = (long) Math.floor(t_sleep*1000.0);
+					int t_sleep_nanos = (int) ((t_sleep%0.001) * 1e9);
+					Thread.sleep(t_sleep_millis, t_sleep_nanos);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 }
