@@ -22,8 +22,8 @@ public class MulticastClient {
     }
 	public static void main(String args[]) {
 		try{
-			MulticastSocket socket = new MulticastSocket(4446);
-			InetAddress group = InetAddress.getByName("224.0.0.1");
+			MulticastSocket socket = new MulticastSocket(GameServer.multicast_port_rcv);
+			InetAddress group = InetAddress.getByName(GameServer.multicast_ip_addr);
 			socket.joinGroup(group);
 			System.out.println("Client up");
 			DatagramPacket packet;

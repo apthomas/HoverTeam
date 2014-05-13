@@ -81,7 +81,7 @@ public class Physics implements Runnable{
 		 * collision with an obstacle.
 		 * Req 3.2.1.3.4
 		 */
-		state.checkCollisions();
+		new_state.checkCollisions();
 		return state;
 	}	
 	
@@ -178,7 +178,7 @@ public class Physics implements Runnable{
 			state = server.getState();
 			// Record the time at which this cycle started, relative to the start of the game.
 			double t_cycle_start = System.nanoTime()*1e-9 - t_start_abs;
-			System.out.println(String.format("t_cycle_start=%.6fs", t_cycle_start));
+			//System.out.println(String.format("t_cycle_start=%.6fs", t_cycle_start));
 			state.setTime(t_cycle_start);
 			// Get the latest control inputs from the GameServer
 			boolean[] controls = server.getControls();
@@ -190,7 +190,7 @@ public class Physics implements Runnable{
 			// Sleep until the next cycle
 			double t_spent = (System.nanoTime()*1e-9 - t_start_abs) - t_cycle_start;
 			double t_sleep = timestep - t_spent;
-			System.out.println(String.format("t_sleep=%.3fms", t_sleep*1000));
+			//System.out.println(String.format("t_sleep=%.3fms", t_sleep*1000));
 			if(t_sleep > 0) {
 				try {
 					long t_sleep_millis = (long) Math.floor(t_sleep*1000.0);

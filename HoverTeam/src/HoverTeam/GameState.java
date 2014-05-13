@@ -11,9 +11,10 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
+import java.io.Serializable;
 
 
-public class GameState {
+public class GameState implements Serializable {
 	private double x, y, theta;	/*Shared resource*/
 	private double x_dot, y_dot, theta_dot;	/*Shared resource*/
 	private int n_players;

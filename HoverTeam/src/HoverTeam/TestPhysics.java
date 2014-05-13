@@ -26,7 +26,7 @@ public class TestPhysics {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		phys = new Physics();
+		phys = new Physics(null);
 
 	}
 	

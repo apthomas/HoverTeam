@@ -19,6 +19,7 @@ public class GameServerDummy extends GameServer {
 		this.setControls(controls);
 		while(this.getState().getTime() < 10 
 				&& this.getState().getGameOutcome()) {
+			broadcastState();
 		System.out.println(String.format(
 				"t=%3fs x=%.3fm, y=%.3fm",
 				this.getState().getTime(),
@@ -30,6 +31,7 @@ public class GameServerDummy extends GameServer {
 				e.printStackTrace();
 			}
 		}
+		multicast_socket.close();
 	}
 	
 	public static void main(String[] argv) {

@@ -18,7 +18,7 @@ public class MulticastServer implements Runnable{
 	public MulticastServer() {
 		
 		try {
-			socket = new DatagramSocket(4445);
+			socket = new DatagramSocket(GameServer.multicast_port_send);
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}		
@@ -41,7 +41,7 @@ public class MulticastServer implements Runnable{
 		// Set up the group to multicast to
 		InetAddress group = null;
 		try {
-			group = InetAddress.getByName("224.0.0.1");
+			group = InetAddress.getByName(GameServer.multicast_ip_addr);
 		} catch (UnknownHostException e2) {
 			e2.printStackTrace();
 		}
@@ -62,7 +62,7 @@ public class MulticastServer implements Runnable{
 			byte[] data = serialize(state);
 			// Pack the byte array into a packet
 			DatagramPacket packet;
-			packet = new DatagramPacket(data, data.length, group, 4446);
+			packet = new DatagramPacket(data, data.length, group, GameServer.multicast_port_rcv);
 			// Send the packet
 			try {
 				socket.send(packet);
