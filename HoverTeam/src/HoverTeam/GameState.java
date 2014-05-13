@@ -107,6 +107,9 @@ public class GameState {
 		velocity[2]=theta_dot;
 		return velocity;
 	}  
+	synchronized int[] getNearObstList(){
+		return near_obst_heights;
+	}
 	private void setNumPlayers(int new_num_players){
 		n_players= new_num_players;
 	}
@@ -128,7 +131,7 @@ public class GameState {
 	 */
 	public void checkCollisions(){
 		// Get the vehicle perimeter shape
-		Path2D currentVehic = getVehicleShapePath();
+		Path2D currentVehic = getVehicleShapePath(x,y);
 
 		// Check collisions between the vehicle shape path and the obstacles 
 		for (int i=0; i<near_obst_heights.length;i++){
@@ -170,7 +173,7 @@ public class GameState {
 	 * the world reference frame.
 	 * @return
 	 */
-	public Path2D.Double getVehicleShapePath() {
+	public Path2D.Double getVehicleShapePath(double x, double y) {
 		double vehicWidth=Physics.length;
 		double vehicHeight= Physics.height;
 		/*
