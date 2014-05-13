@@ -1,67 +1,86 @@
 /**
  * HoverTeam
- * 16.35 Spring 2014 Final Project
- * @author Aaron Thomas and Matt Vernacchia
- */
-package HoverTeam;
-
-/**
- * HoverTeam
 
 
  * 16.35 Spring 2014 Final Project
  * @author Aaron Thomas and Matt Vernacchia
  */
+//package HoverTeam;
+
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 
 import javax.swing.JFrame;
-public class Display extends JFrame implements Runnable{
-	public static final int frameWidth=30;
-	public static final int frameHeight=30;
-	public int sec;
-	public int mSec;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+public class Display extends JPanel implements Runnable{
+	public static final int frameWidth=1300;
+	public static final int frameHeight=700;
 	public double score;
 	public double updateTimeInterval=25;
 	public double prevUpdatedTime=0;
+	public double sF=75;	//scale Factor
+	public double heightError=100;
 	
 	public Display(){
-		JFrame frame = new JFrame();
-		frame.setSize(frameWidth, frameHeight);
-		frame.setTitle("You are playing HoverTeam!!!");
-		sec=0;
-		mSec=0;
+		System.out.println("completed constructor.");
 	}
-	public void repaint(){
+	public void paintComponent(Graphics g){
+		System.out.println("currently painting.");
+		Graphics2D g2 = (Graphics2D) g;
+		/*
+		 * Testing with random GameState
+		 
+		double[] pos = {28,6,Math.PI/8};
+		double[] vel = {5,5,0};
+		int[] nearList = {4,8,7,5};
+		GameState gs = new GameState(pos,vel,2,2,nearList,3);
+		*/
 		GameState gs = GameClient.getGameState();
-		Graphics2D g = (Graphics2D)this.getGraphics();
 		/*
 		 * Drawing the vehicle in the center of the screen with regards to the x-coordinate and then referencing the walls to it.
 		 */
 		Path2D.Double vehic = gs.getVehicleShapePath(frameWidth/2, gs.getPosition()[1]);
-		g.draw(vehic);
+		g2.draw(vehic);
 		int[] nearObstHeights = gs.getNearObstList();
 		double vehiclePast = gs.getPosition()[0]%5;	//distance that the vehicle is past the second obstacle--reference to where to draw obstacles
 		for (int i =0; i<nearObstHeights.length;i++){
-			Rectangle2D.Double obstacle = new Rectangle2D.Double(frameWidth/2 -vehiclePast+5*(i-1),nearObstHeights[i],1,nearObstHeights[i]);
-			g.draw(obstacle);
+			Rectangle2D.Double obstacle = new Rectangle2D.Double(frameWidth/2 -sF*vehiclePast+sF*5*(i-1),frameHeight-heightError,10,nearObstHeights[i]*sF);
+			g2.draw(obstacle);
+			g2.fill(obstacle);
 		}
 		score = gs.getPosition()[0]/5;
-		g.drawString("Score:"+score, frameWidth/2, frameHeight);
-		
+		g.drawString("Score:"+score, frameWidth/2, 100);
 	}
 	public void run(){
-		double tAdvanced=0;
-	
-		while (score<25){
+		/*
+		 * No maximum score, game goes on forever.
+		 */
+
+		System.out.println("entereed run method.");
+		while (true){	
 			long currentTime = System.currentTimeMillis();
 	    	if (currentTime-prevUpdatedTime>updateTimeInterval){
+	    		System.out.println("entered if statement");
 	    		prevUpdatedTime = currentTime;
 	    		repaint();
+	    		System.out.println("should have just repainted.");
 	    	}
 		}
-	    System.out.println("You win!!!");
 		
+	}
+	public static void main(String[] args){
+		JFrame frame = new JFrame("Frame and Panel");
+		JLabel label= new JLabel("HoverTeam by Aaron Thomas and Matthew Vernacchia");
+		frame.setTitle("You are playing HoverTeam!!!");
+		Display panel = new Display();
+		(new Thread(panel)).start();
+		panel.add(label);
+		frame.getContentPane().add(panel);
+		frame.setSize(frameWidth, frameHeight);
+		frame.setVisible(true);
+	   
 	}
 }
