@@ -84,7 +84,18 @@ public class Display extends JPanel implements Runnable{
 		}
 
 	}
+	
+	public void setup() {
+		JFrame frame = new JFrame("Frame and Panel");
+		JLabel label= new JLabel("HoverTeam by Aaron Thomas and Matthew Vernacchia");
+		frame.setTitle("You are playing HoverTeam!!!");
+		this.add(label);
+		frame.getContentPane().add(this);
+		frame.setSize(frameWidth, frameHeight);
+		frame.setVisible(true);
+	}
 	public static void main(String[] args){
+		/*
 		JFrame frame = new JFrame("Frame and Panel");
 		JLabel label= new JLabel("HoverTeam by Aaron Thomas and Matthew Vernacchia");
 		frame.setTitle("You are playing HoverTeam!!!");
@@ -94,6 +105,9 @@ public class Display extends JPanel implements Runnable{
 		frame.getContentPane().add(panel);
 		frame.setSize(frameWidth, frameHeight);
 		frame.setVisible(true);
-
+		*/
+		Display panel = new Display();
+		panel.setup();
+		(new Thread(panel)).start();
 	}
 }
