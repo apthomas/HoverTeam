@@ -75,6 +75,9 @@ public class GameServerReceiver  implements Runnable {
 				client_index = ip_addrs.size();
 				ip_addrs.add(packet.getAddress());
 				controls.add(false);
+				GameState a = gs.getState();
+				a.setNumPlayers(ip_addrs.size()+1);
+				gs.setState(a);
 			}
 			if (data[0] == 0) {
 				System.out.println("ServerRcv: Thruster OFF");

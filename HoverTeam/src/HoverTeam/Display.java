@@ -11,31 +11,37 @@ package HoverTeam;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.AffineTransformOp;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class Display extends JPanel implements Runnable, KeyListener{
-	public static final int frameWidth=500;
-	public static final int frameHeight=200;
+	public static final int frameWidth=1300;
+	public static final int frameHeight=700;
 	public double score;
 	/**
 	 * The time in between redraws of the graphics [seconds]
 	 */
 	public final double updateTimeInterval=0.030;
-	public double sF=frameHeight/10.0;	//scale Factor
+	public static double sF = frameHeight/10.5;;	//scale Factor
 	public double heightError=100;
+	protected String myHostName;
 	GameClient gc;
-	
 	public Display(){
 		
+	}
+
+	public Display(String hostname){
+		myHostName=hostname;
 	}
 	public void paintComponent(Graphics g){
 		super.paintComponent(g);
@@ -46,7 +52,7 @@ public class Display extends JPanel implements Runnable, KeyListener{
 		double[] pos = {47,9,Math.PI/8};
 		double[] vel = {5,5,0};
 		int[] nearList = {4,8,7,5};
-		GameState gs = new GameState(pos,vel,2,2,nearList,3);
+		GameState gs = new GameState(pos,vel,2,7,nearList,3);
 		if(gc != null && gc.getState() != null) {
 			gs = gc.getState();
 		}
@@ -60,6 +66,13 @@ public class Display extends JPanel implements Runnable, KeyListener{
 		Path2D.Double transformedVehic = new Path2D.Double(vehic, mirror);
 		g2.draw(transformedVehic);
 		g2.fill(transformedVehic);
+		
+		g2.setColor(Color.blue);
+		Path2D.Double bottomLine = gs.getVehicleBottomLine(frameWidth/2, gs.getPosition()[1]*sF,(int)sF);
+		Path2D.Double transformedLine = new Path2D.Double(bottomLine, mirror);
+		g2.draw(transformedLine);
+		g2.fill(transformedLine);
+		
 		int[] nearObstHeights = gs.getNearObstList();
 		double vehiclePast = gs.getPosition()[0]%5;	//distance that the vehicle is past the second obstacle--reference to where to draw obstacles
 		g2.setColor(Color.black);
@@ -70,8 +83,24 @@ public class Display extends JPanel implements Runnable, KeyListener{
 			g2.draw(transformedObstacle);
 			g2.fill(transformedObstacle);
 		}
+		g2.setColor(Color.green);
+		Path2D.Double[] thrusters = gs.getThrusterLocations(frameWidth/2, gs.getPosition()[1]*sF,(int)sF);
+		for (int j = 0;j<thrusters.length;j++){
+			Path2D.Double thruster = thrusters[j];
+			Path2D.Double transformedThruster = new Path2D.Double(thruster,mirror);
+			g2.draw(transformedThruster);
+			g2.fill(transformedThruster);
+			
+		}
+		g2.setColor(Color.black);
 		score = Math.floor(gs.getPosition()[0]/5);
 		g.drawString("Score is:"+score, frameWidth/2, (int)heightError-50);
+		g.drawString("KEY", 20, 15);
+		g.drawString("Black denotes obstacle", 20, 30);
+		g.drawString("Red denotes vehicle", 20, 45);
+		g.drawString("Blue denotes bottom side of vehicle", 20, 60);
+		g.drawString("Green denotes thrusters",20,75);
+		g.drawString("Display running on "+myHostName, frameWidth-300,30);
 	}
 	public void setGameClient(GameClient gc){
 		this.gc=gc;
@@ -129,9 +158,29 @@ public class Display extends JPanel implements Runnable, KeyListener{
 		frame.setSize(frameWidth, frameHeight);
 		frame.setVisible(true);
 		*/
-		Display panel = new Display();
-		panel.setup();
-		(new Thread(panel)).start();
+		try {
+		      ServerSocket s = new ServerSocket(5065);
+		      s.setReuseAddress(true);      
+		      if (!s.isBound())
+		    	  System.exit(-1);
+		      String address = GeneralInetAddress.getLocalHost().getHostAddress();
+		      Display panel = new Display(address);
+		      panel.setup();
+		      (new Thread(panel)).start();
+		      /*
+		      do {
+			Socket client = s.accept();
+			.addClient(client);
+		      } while (true);
+		      */
+		    } 
+		    catch (IOException e) {
+		      System.err.println("I couldn't create a new socket.\n"+
+					 "You probably are already running DisplayServer.\n");
+		      System.err.println(e);
+		      System.exit(-1);
+		    }
+		
 	}
 	
 	@Override
