@@ -32,13 +32,13 @@ public class GameState implements Serializable {
 	private boolean gameOutcome;
 
 	//constants
-	private final int num_heights_in_near_list=4;
-	private final int obstacle_width=1;
-	private final int obstacle_spacing=5;
-	public final double MIN_LINEAR_VEL = -10;
-	public final double MAX_LINEAR_VEL = 10;
-	public final double MIN_ANGULAR_VEL = -Math.PI/4;
-	public final double MAX_ANGULAR_VEL = Math.PI/4;
+	public static final int num_heights_in_near_list=4;
+	public static final int obstacle_width=1;
+	public static final int obstacle_spacing=5;
+	public static final double MIN_LINEAR_VEL = -10;
+	public static final double MAX_LINEAR_VEL = 10;
+	public static final double MIN_ANGULAR_VEL = -Math.PI/4;
+	public static final double MAX_ANGULAR_VEL = Math.PI/4;
 
 	public GameState(double[] position, double[] velocity, double time, int nPlayers, int[] nearObstHeights, int nearObstIndex){
 		if (position.length != 3)
@@ -53,6 +53,17 @@ public class GameState implements Serializable {
 		near_obst_heights = nearObstHeights;
 		near_obst_start_i = nearObstIndex;
 		gameOutcome = true;	
+	}
+	synchronized public void setNearObst(int[] h) {
+		if (h.length == num_heights_in_near_list) {
+			near_obst_heights = h;
+		} else
+			throw new IllegalArgumentException(String.format(
+					"The near obstacle heights list must be %d elements long",
+					num_heights_in_near_list));
+	}
+	synchronized public void setNearObstStartI(int i) {
+		near_obst_start_i = i;
 	}
 	synchronized public void setTime(double new_time) {
 		if(new_time>0) {

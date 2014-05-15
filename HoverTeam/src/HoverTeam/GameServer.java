@@ -13,6 +13,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class GameServer implements Runnable{
 	/** 
@@ -45,6 +47,11 @@ public class GameServer implements Runnable{
 	 * Multicast IP address group for broadcasting the GameState.
 	 */
 	InetAddress multicast_group = null;
+	/**
+	 * The list of all obstacles. Each obstacle is represented by an
+	 * integer defining its height.
+	 */
+	private ArrayList<Integer> all_obst;
 
 	public GameServer() {
 		// Set up the socket for broadcasting the GameState.
@@ -59,15 +66,19 @@ public class GameServer implements Runnable{
 		} catch (UnknownHostException e2) {
 			e2.printStackTrace();
 		}
+		// Initialize the obstacles.
+		all_obst = new ArrayList<Integer>();
 		// Initialize the controls inputs.
 		boolean[] controls = {false};
 		this.setControls(controls);
 		// Initialize the GameState.
 		int[] nearObstHeights = {1};
 		int nearObstIndex = 0;
-		double[] pos = {5, 5, 0};
-		double[] vel = {0, 0, 0};
+		double[] pos = {-2, 8.5, 0};
+		double[] vel = {0.1, 0, 0};
 		this.setState(new GameState(pos, vel, 0, 0, nearObstHeights, nearObstIndex));
+		// Initialize the obstacles.
+		all_obst = new ArrayList<Integer>();
 	}
 
 	public static byte[] serialize(Object o) {
@@ -82,6 +93,57 @@ public class GameServer implements Runnable{
 		return byteStream.toByteArray();
 	}
 
+	/**
+	 * Generate the height for a new Obstacle
+	 * @return the height
+	 * @see Req. 3.2.2.3
+	 */
+	public int makeObstacle() {
+		Random randomGenerator = new Random();
+		return randomGenerator.nextInt(8);
+	}
+	
+	/**
+	 * 
+	 * @param all_obst The list of all obstacles. It is modified by this method.
+	 * @param currentX
+	 * @return An array of the heights of nearby obstacles
+	 * @see Req. 3.2.2.4
+	 */
+	public int[] generateNearList(ArrayList<Integer> all_obst, double currentX) {
+		// How far in the x direction the all_obst list reaches.
+		double all_extent_x = (all_obst.size()-2)*GameState.obstacle_spacing;
+		double near_extent_x = GameState.num_heights_in_near_list * GameState.obstacle_spacing;
+		while ( currentX - all_extent_x > -near_extent_x/2) {
+			// We need to make more obstacles
+			all_obst.add(makeObstacle());
+			all_extent_x = (all_obst.size()-2)*GameState.obstacle_spacing;
+			System.out.println(String.format(
+					"all_extent_x = %.2fm",
+					all_extent_x));
+		}
+		int near_obst_start_i = 
+				(int) (Math.floor(currentX/GameState.obstacle_spacing)
+				- GameState.num_heights_in_near_list/2) + 1;
+		if (near_obst_start_i < 0) { near_obst_start_i = 0; }
+		int[] near_list = new int[GameState.num_heights_in_near_list];
+		for (int i=near_obst_start_i;
+				i<(GameState.num_heights_in_near_list+near_obst_start_i); i++){
+			near_list[i-near_obst_start_i] = all_obst.get(i);
+		}
+		
+		// push the new nearlist on the state
+		synchronized(this) {
+		GameState state = getState();
+		if(state != null) {
+			state.setNearObst(near_list);
+			state.setNearObstStartI(near_obst_start_i);
+			setState(state);
+		}
+		}
+		
+		return near_list;
+	}
 	/**
 	 * Broadcast the GameState to the Clients using UDP Multicast.
 	 */
@@ -123,6 +185,7 @@ public class GameServer implements Runnable{
 
 	public void run() {
 		while(this.getState().getGameOutcome()) {
+			generateNearList(all_obst, this.getState().getPosition()[0]);
 			broadcastState();
 			/*
 			System.out.println(String.format(
