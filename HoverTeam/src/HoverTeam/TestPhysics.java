@@ -74,10 +74,31 @@ public class TestPhysics {
 		assertEquals(expected_forces[1], forces[1], 1e-6);
 	}
 	@Test
-	public void test_getTorque() {
+	public void test_getTorque_neg() {
 		boolean[] controls = {true, false, false};
 		double torque = phys.getTorque(controls);
 		double expected_torque = -phys.F_thruster*(Physics.length/2);
+		assertEquals(expected_torque, torque, 1e-6);
+	}
+	@Test
+	public void test_getTorque_neg2() {
+		boolean[] controls = {true, false};
+		double torque = phys.getTorque(controls);
+		double expected_torque = -phys.F_thruster*(Physics.length/2);
+		assertEquals(expected_torque, torque, 1e-6);
+	}
+	@Test
+	public void test_getTorque_pos() {
+		boolean[] controls = {false, false, true};
+		double torque = phys.getTorque(controls);
+		double expected_torque = phys.F_thruster*(Physics.length/2);
+		assertEquals(expected_torque, torque, 1e-6);
+	}
+	@Test
+	public void test_getTorque_pos2() {
+		boolean[] controls = {false, true};
+		double torque = phys.getTorque(controls);
+		double expected_torque = phys.F_thruster*(Physics.length/2);
 		assertEquals(expected_torque, torque, 1e-6);
 	}
 	
@@ -157,6 +178,24 @@ public class TestPhysics {
 	public void test_updateState_ang_mom() {
 		boolean[] controls = {true, false};
 		double torque = -Physics.length/2 * phys.F_thruster;
+		double t_final = 1e-2;
+		
+		GameState state = new GameState(zero_pos, zero_vel, 0.0, 1, obst, start_i);
+		for(double t = 0; t<t_final; t += t_final*1e-4) {
+			state.setTime(t);
+			state = phys.updateState(state, controls);
+		}
+		double expected_ang_mom = torque*t_final;
+		double actual_ang_mom = state.getVelocity()[2]*phys.I;
+		assertEquals(expected_ang_mom, actual_ang_mom, 1e-5);
+	}
+	/**
+	 * Test that updateState obeys the conservation of angular  momentum.
+	 */
+	@Test
+	public void test_updateState_ang_mom_neg() {
+		boolean[] controls = {false, true};
+		double torque = Physics.length/2 * phys.F_thruster;
 		double t_final = 1e-2;
 		
 		GameState state = new GameState(zero_pos, zero_vel, 0.0, 1, obst, start_i);

@@ -142,7 +142,7 @@ public class Physics implements Runnable{
 		double torque = 0;
 		for(int i=0; i<controls.length; i++) {
 			if(controls[i]) {
-				torque += F_thruster * thruster_pos[i][0];
+				torque = torque + F_thruster * thruster_pos[i][0];
 			}
 		}
 		return torque;
@@ -163,6 +163,12 @@ public class Physics implements Runnable{
 		if(n==1) {
 			thruster_pos[0][0] = 0;
 			thruster_pos[0][1] = -Physics.height/2;
+		}
+		else if (n==2) {
+			thruster_pos[0][0] = -Physics.length/2;
+			thruster_pos[0][1] = -Physics.height/2;
+			thruster_pos[1][0] = Physics.length/2;
+			thruster_pos[1][1] = -Physics.height/2;
 		}
 		else {
 			for(int i = 0; i < n; i++) {
