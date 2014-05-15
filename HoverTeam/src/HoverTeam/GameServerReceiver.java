@@ -52,7 +52,7 @@ public class GameServerReceiver  implements Runnable {
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		System.out.println("Server control receiver is up.");
+		System.out.println("ServerReceiver is up.");
 		while(true) { // Infinite loop is bad, we should fix this.
 			// Set up to receive a packet.
 			byte[] data = new byte[1];

@@ -9,8 +9,7 @@ public class GameServerDummy extends GameServer {
 		int nearObstIndex = 0;
 		double[] pos = {5, 5, 0};
 		double[] vel = {0, 0, 0};
-		this.setState(new GameState(pos, vel, 0, 0, nearObstHeights, nearObstIndex));
-		
+		this.setState(new GameState(pos, vel, 0, 0, nearObstHeights, nearObstIndex));		
 	}
 	
 	@Override

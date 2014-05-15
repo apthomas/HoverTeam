@@ -171,6 +171,7 @@ public class Physics implements Runnable{
 	public void run() {
 		// Record the start time.
 		double t_start_abs = System.nanoTime()*1e-9;
+		System.out.println("Physics is up");
 		// Run the physics until the player(s) lose.
 		GameState state = server.getState();
 		while(state.getGameOutcome()) {

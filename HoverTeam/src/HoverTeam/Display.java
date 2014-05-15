@@ -46,8 +46,9 @@ public class Display extends JPanel implements Runnable, KeyListener{
 		double[] vel = {5,5,0};
 		int[] nearList = {4,8,7,5};
 		GameState gs = new GameState(pos,vel,2,2,nearList,3);
-		
-		//GameState gs = gc.getState();
+		if(gc != null) {
+			gs = gc.getState();
+		}
 		/*
 		 * Drawing the vehicle in the center of the screen with regards to the x-coordinate and then referencing the walls to it.
 		 */
@@ -82,6 +83,7 @@ public class Display extends JPanel implements Runnable, KeyListener{
 		double t_start_abs = System.nanoTime()*1e-9;
 		while (true){	
 			double t_cycle_start = System.nanoTime()*1e-9 - t_start_abs;
+			this.removeAll();
 			repaint();
 			//System.out.println("should have just repainted.");
 			// Sleep until the next cycle

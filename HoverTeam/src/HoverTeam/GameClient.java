@@ -145,7 +145,7 @@ public class GameClient implements Runnable {
 			GameState state = getState();
 			if(state != null) {
 				if(!state.getGameOutcome()) {break;}
-				System.out.println(state.getTime());
+				//System.out.println(state.getTime());
 			}
 			try {
 				Thread.sleep(100);

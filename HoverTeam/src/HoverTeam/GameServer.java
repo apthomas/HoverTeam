@@ -59,6 +59,15 @@ public class GameServer implements Runnable{
 		} catch (UnknownHostException e2) {
 			e2.printStackTrace();
 		}
+		// Initialize the controls inputs.
+		boolean[] controls = {false};
+		this.setControls(controls);
+		// Initialize the GameState.
+		int[] nearObstHeights = {1};
+		int nearObstIndex = 0;
+		double[] pos = {5, 5, 0};
+		double[] vel = {0, 0, 0};
+		this.setState(new GameState(pos, vel, 0, 0, nearObstHeights, nearObstIndex));
 	}
 
 	public static byte[] serialize(Object o) {
@@ -113,16 +122,16 @@ public class GameServer implements Runnable{
 	}
 
 	public void run() {
-		boolean[] controls = {true, true};
-		this.setControls(controls);
 		while(this.getState().getTime() < 10 
 				&& this.getState().getGameOutcome()) {
 			broadcastState();
-		System.out.println(String.format(
+			/*
+			System.out.println(String.format(
 				"t=%3fs x=%.3fm, y=%.3fm",
 				this.getState().getTime(),
 				this.getState().getPosition()[0],
 				this.getState().getPosition()[1]));
+				*/
 			try {
 				Thread.sleep(10);
 			} catch (InterruptedException e) {
@@ -130,5 +139,20 @@ public class GameServer implements Runnable{
 			}
 		}
 		multicast_socket.close();
+	}
+	public static void main(String[] argv) {
+		GameServer server = new GameServer();
+		GameServerReceiver gsr = new GameServerReceiver(server);
+		Physics phys = new Physics(server);
+		// Make and start the server-side threads.
+		System.out.println("running Server...");
+		Thread server_thread = new Thread(server);
+		server_thread.start();
+		System.out.println("running ServerReceiver...");
+		Thread gsr_thread = new Thread(gsr);
+		gsr_thread.start();
+		System.out.println("running Physics...");
+		Thread phys_thread = new Thread(phys);
+		phys_thread.start();			
 	}
 }
