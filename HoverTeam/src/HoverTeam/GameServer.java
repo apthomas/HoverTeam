@@ -113,7 +113,22 @@ public class GameServer implements Runnable{
 	}
 
 	public void run() {
-		// TODO Auto-generated method stub
-
+		boolean[] controls = {true, true};
+		this.setControls(controls);
+		while(this.getState().getTime() < 10 
+				&& this.getState().getGameOutcome()) {
+			broadcastState();
+		System.out.println(String.format(
+				"t=%3fs x=%.3fm, y=%.3fm",
+				this.getState().getTime(),
+				this.getState().getPosition()[0],
+				this.getState().getPosition()[1]));
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		multicast_socket.close();
 	}
 }
