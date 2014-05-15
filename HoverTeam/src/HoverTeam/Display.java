@@ -50,26 +50,11 @@ public class Display extends JPanel implements Runnable, KeyListener{
 		if(gc != null && gc.getState() != null) {
 			gs = gc.getState();
 		}
-		System.out.println(String.format(
-				"t=%3fs, x=%.3fm, y=%.3fm, theta=%.1fdeg",
-				gs.getTime(),
-				gs.getPosition()[0],
-				gs.getPosition()[1],
-				gs.getPosition()[2]*180.0/Math.PI ));
 		/*
 		 * Drawing the vehicle in the center of the screen with regards to the x-coordinate and then referencing the walls to it.
 		 */
 		g2.setColor(Color.red);
 		Path2D.Double vehic = gs.getVehicleShapePath(frameWidth/2, gs.getPosition()[1]*sF,(int)sF);
-		/*
-		Rectangle2D bounds_untrans = vehic.getBounds2D();
-		System.out.println(String.format(
-				"Display: bounding rect (untrans): x=%.1fpx, y=%.1fpx, w=%.1fpx, h=%.1fpx",
-				bounds_untrans.getCenterX(),
-				bounds_untrans.getCenterY(),
-				bounds_untrans.getWidth(),
-				bounds_untrans.getHeight()));
-				*/
 		AffineTransform mirror = AffineTransform.getScaleInstance(1.0,-1.0);
 		mirror.translate(0, -frameHeight);
 		Path2D.Double transformedVehic = new Path2D.Double(vehic, mirror);

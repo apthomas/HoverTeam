@@ -182,21 +182,9 @@ public class GameState implements Serializable {
 		 * vehicle center is x,y
 		 * setting 
 		 */
-		double[] topLeft = new double[2];
-		double[] topRight = new double[2];
 		double[] bottomLeft = new double[2];
-		double[] bottomRight = new double[2];
-		topLeft[0] = x-vehicWidth/2;
-		topLeft[1] = y+vehicHeight/2;
-
-		topRight[0]= x+vehicWidth/2;
-		topRight[1] = y+vehicHeight/2;
-
 		bottomLeft[0]=x-vehicWidth/2;
 		bottomLeft[1]=y-vehicWidth/2;
-
-		bottomRight[0]=x+vehicWidth/2;
-		bottomRight[1]= y+vehicHeight/2;
 		
 		Rectangle2D.Double currentVehic = new Rectangle2D.Double(bottomLeft[0], bottomLeft[1],vehicWidth, vehicHeight);
 		// Rotate the vehicle perimeter about its center
@@ -206,16 +194,6 @@ public class GameState implements Serializable {
 		//currentVehic.setTransform(rotate);
 		Path2D.Double rotatedVehic = new Path2D.Double(currentVehic, rotate);
 		return rotatedVehic;
-	}
-	private double[] computeCornerOfRect(double xCorner, double yCorner){
-		double sinTheta=Math.sin(theta);
-		double cosTheta=Math.cos(theta);
-		double newX=x+(xCorner-x)*cosTheta+(yCorner-y)*sinTheta;
-		double newY = y-(xCorner-x)*sinTheta+(yCorner-y)*cosTheta;
-		double[] cornerRect = new double[2];
-		cornerRect[0]=newX;
-		cornerRect[1]= newY;
-		return cornerRect;
 	}
 
 	/**

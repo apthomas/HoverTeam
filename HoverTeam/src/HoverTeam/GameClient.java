@@ -145,17 +145,6 @@ public class GameClient implements Runnable {
 			GameState state = getState();
 			if(state != null) {
 				if(!state.getGameOutcome()) {break;}
-				/*
-				System.out.println(String.format(
-						"t=%3fs x=%.3fm, y=%.3fm",
-						state.getTime(),
-						state.getPosition()[0],
-						state.getPosition()[1]));
-						*/
-				//Testing
-				if(state.getTime() > 1.0) {
-					this.thrusterOn();
-				}
 			}
 			try {
 				Thread.sleep(100);
