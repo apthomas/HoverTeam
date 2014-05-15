@@ -76,7 +76,7 @@ public class GameServerReceiver  implements Runnable {
 				ip_addrs.add(packet.getAddress());
 				controls.add(false);
 				GameState a = gs.getState();
-				a.setNumPlayers(ip_addrs.size()+1);
+				a.setNumPlayers(ip_addrs.size());
 				gs.setState(a);
 			}
 			if (data[0] == 0) {

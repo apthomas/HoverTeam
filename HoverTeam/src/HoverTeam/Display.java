@@ -25,19 +25,19 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class Display extends JPanel implements Runnable, KeyListener{
-	public static final int frameWidth=1300;
-	public static final int frameHeight=700;
+	public static final int frameWidth=500;
+	public static final int frameHeight=300;
 	public double score;
 	/**
 	 * The time in between redraws of the graphics [seconds]
 	 */
 	public final double updateTimeInterval=0.030;
-	public static double sF = frameHeight/10.5;;	//scale Factor
+	public static double sF = frameHeight/10.5;	//scale Factor
 	public double heightError=100;
 	protected String myHostName;
 	GameClient gc;
 	public Display(){
-		
+
 	}
 
 	public Display(String hostname){
@@ -48,7 +48,7 @@ public class Display extends JPanel implements Runnable, KeyListener{
 		Graphics2D g2 = (Graphics2D) g;
 		/*
 		 * Testing with random GameState
-		*/
+		 */
 		double[] pos = {47,9,Math.PI/8};
 		double[] vel = {5,5,0};
 		int[] nearList = {4,8,7,5};
@@ -66,13 +66,13 @@ public class Display extends JPanel implements Runnable, KeyListener{
 		Path2D.Double transformedVehic = new Path2D.Double(vehic, mirror);
 		g2.draw(transformedVehic);
 		g2.fill(transformedVehic);
-		
+
 		g2.setColor(Color.blue);
 		Path2D.Double bottomLine = gs.getVehicleBottomLine(frameWidth/2, gs.getPosition()[1]*sF,(int)sF);
 		Path2D.Double transformedLine = new Path2D.Double(bottomLine, mirror);
 		g2.draw(transformedLine);
 		g2.fill(transformedLine);
-		
+
 		int[] nearObstHeights = gs.getNearObstList();
 		double vehiclePast = gs.getPosition()[0]%5;	//distance that the vehicle is past the second obstacle--reference to where to draw obstacles
 		g2.setColor(Color.black);
@@ -85,12 +85,14 @@ public class Display extends JPanel implements Runnable, KeyListener{
 		}
 		g2.setColor(Color.green);
 		Path2D.Double[] thrusters = gs.getThrusterLocations(frameWidth/2, gs.getPosition()[1]*sF,(int)sF);
-		for (int j = 0;j<thrusters.length;j++){
-			Path2D.Double thruster = thrusters[j];
-			Path2D.Double transformedThruster = new Path2D.Double(thruster,mirror);
-			g2.draw(transformedThruster);
-			g2.fill(transformedThruster);
-			
+		if(thrusters != null) {
+			for (int j = 0;j<thrusters.length;j++){
+				Path2D.Double thruster = thrusters[j];
+				Path2D.Double transformedThruster = new Path2D.Double(thruster,mirror);
+				g2.draw(transformedThruster);
+				g2.fill(transformedThruster);
+
+			}
 		}
 		g2.setColor(Color.black);
 		score = Math.floor(gs.getPosition()[0]/5);
@@ -157,32 +159,32 @@ public class Display extends JPanel implements Runnable, KeyListener{
 		frame.getContentPane().add(panel);
 		frame.setSize(frameWidth, frameHeight);
 		frame.setVisible(true);
-		*/
+		 */
 		try {
-		      ServerSocket s = new ServerSocket(5065);
-		      s.setReuseAddress(true);      
-		      if (!s.isBound())
-		    	  System.exit(-1);
-		      String address = GeneralInetAddress.getLocalHost().getHostAddress();
-		      Display panel = new Display(address);
-		      panel.setup();
-		      (new Thread(panel)).start();
-		      /*
+			ServerSocket s = new ServerSocket(5065);
+			s.setReuseAddress(true);      
+			if (!s.isBound())
+				System.exit(-1);
+			String address = GeneralInetAddress.getLocalHost().getHostAddress();
+			Display panel = new Display(address);
+			panel.setup();
+			(new Thread(panel)).start();
+			/*
 		      do {
 			Socket client = s.accept();
 			.addClient(client);
 		      } while (true);
-		      */
-		    } 
-		    catch (IOException e) {
-		      System.err.println("I couldn't create a new socket.\n"+
-					 "You probably are already running DisplayServer.\n");
-		      System.err.println(e);
-		      System.exit(-1);
-		    }
-		
+			 */
+		} 
+		catch (IOException e) {
+			System.err.println("I couldn't create a new socket.\n"+
+					"You probably are already running DisplayServer.\n");
+			System.err.println(e);
+			System.exit(-1);
+		}
+
 	}
-	
+
 	@Override
 	public void keyPressed(KeyEvent e) {
 		int keyCode = e.getKeyCode();
@@ -193,7 +195,7 @@ public class Display extends JPanel implements Runnable, KeyListener{
 			if(gc != null) { gc.thrusterOn(); }
 		}
 	}
-	
+
 	@Override
 	public void keyReleased(KeyEvent e) {
 		//System.out.println("key released");
@@ -204,7 +206,7 @@ public class Display extends JPanel implements Runnable, KeyListener{
 			if(gc != null) { gc.thrusterOff(); }
 		}
 	}
-	
+
 	@Override
 	public void keyTyped(KeyEvent arg0) {
 		// TODO Auto-generated method stub		

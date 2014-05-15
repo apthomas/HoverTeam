@@ -75,7 +75,7 @@ public class GameServer implements Runnable{
 		int[] nearObstHeights = {1};
 		int nearObstIndex = 0;
 		double[] pos = {-2, 8.5, 0};
-		double[] vel = {0.1, 0, 0};
+		double[] vel = {1, 0, 0};
 		this.setState(new GameState(pos, vel, 0, 0, nearObstHeights, nearObstIndex));
 		// Initialize the obstacles.
 		all_obst = new ArrayList<Integer>();

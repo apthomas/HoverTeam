@@ -237,7 +237,10 @@ public class GameState implements Serializable {
 
 		bottomRight[0]=x+vehicWidth/2;
 		bottomRight[1]= y-vehicHeight/2;
-		if (n_players<2){
+		if(n_players <=0 ) {
+			return null;
+		}
+		else if (n_players<2){
 			Rectangle2D.Double thruster = new Rectangle2D.Double(bottomLeft[0]+vehicWidth/2, bottomLeft[1]-vehicHeight/5, thrusterWidth, vehicHeight/5);
 			AffineTransform rotate = new AffineTransform();
 			rotate.setToRotation(theta, x, y);
