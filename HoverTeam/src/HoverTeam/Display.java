@@ -12,6 +12,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
@@ -19,7 +21,8 @@ import java.awt.image.AffineTransformOp;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-public class Display extends JPanel implements Runnable{
+
+public class Display extends JPanel implements Runnable, KeyListener{
 	public static final int frameWidth=1300;
 	public static final int frameHeight=700;
 	public double score;
@@ -80,7 +83,7 @@ public class Display extends JPanel implements Runnable{
 		while (true){	
 			double t_cycle_start = System.nanoTime()*1e-9 - t_start_abs;
 			repaint();
-			System.out.println("should have just repainted.");
+			//System.out.println("should have just repainted.");
 			// Sleep until the next cycle
 			double t_spent = (System.nanoTime()*1e-9 - t_start_abs) - t_cycle_start;
 			double t_sleep = updateTimeInterval - t_spent;
@@ -107,6 +110,10 @@ public class Display extends JPanel implements Runnable{
 		frame.getContentPane().add(this);
 		frame.setSize(frameWidth, frameHeight);
 		frame.setVisible(true);
+		/* Add this thread as a KeyListener so that the KeyPressed and KeyReleased callbacks
+		 * will be called when the user touches keys.
+		 */
+		frame.addKeyListener(this);
 	}
 	public static void main(String[] args){
 		/*
@@ -123,5 +130,32 @@ public class Display extends JPanel implements Runnable{
 		Display panel = new Display();
 		panel.setup();
 		(new Thread(panel)).start();
+	}
+	
+	@Override
+	public void keyPressed(KeyEvent e) {
+		int keyCode = e.getKeyCode();
+		//System.out.println("key pressed");
+		// If the space bar was pressed...
+		if(keyCode == 32) {
+			//...turn the thruster on.
+			if(gc != null) { gc.thrusterOn(); }
+		}
+	}
+	
+	@Override
+	public void keyReleased(KeyEvent e) {
+		//System.out.println("key released");
+		int keyCode = e.getKeyCode();
+		// If the space bar was released...
+		if(keyCode == 32) {
+			//...turn the thruster off.
+			if(gc != null) { gc.thrusterOff(); }
+		}
+	}
+	
+	@Override
+	public void keyTyped(KeyEvent arg0) {
+		// TODO Auto-generated method stub		
 	}
 }
