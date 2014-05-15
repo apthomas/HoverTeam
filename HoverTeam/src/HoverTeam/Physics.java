@@ -18,11 +18,7 @@ public class Physics implements Runnable{
 	 * The last time the state was updated.
 	 * Measured in seconds from the game start.
 	 */
-	private double t_last = 0;
-	/**
-	 * The thrust of each thruster [Newtons].
-	 */
-	public final double F_thruster = 1;
+	private double t_last = 0;	
 	/**
 	 * The vehicle mass [kilograms].
 	 */
@@ -32,6 +28,10 @@ public class Physics implements Runnable{
 	 * The acceleration due to gravity [meters/second^2].
 	 */
 	public final double g = 1;
+	/**
+	 * The thrust of each thruster [Newtons].
+	 */
+	public final double F_thruster = 1.5*m*g;
 	/**
 	 * The vehicle length [meters].
 	 */
@@ -70,7 +70,7 @@ public class Physics implements Runnable{
 		/* Generate a system of forces and torques on the vehicle. 
 		 * Req 3.2.1.3.1.
 		 */
-		double forces[] = getForces(controls);
+		double forces[] = getForces(controls, state);
 		double torque = getTorque(controls);
 		/* Update the state of the vehicle, 
 		 * using a model of the vehicle dynamics and the applied forces/torques
@@ -115,10 +115,10 @@ public class Physics implements Runnable{
 	 * @param controls Indicates which thrusters are on (true=on).
 	 * @return The forces (Fx, Fy) on the vehicle in the world frame [Newtons].
 	 */
-	double[] getForces(boolean controls[]){
+	double[] getForces(boolean controls[], GameState state){
 		double[] F = {0,0};
 		// Thruster force
-		double theta = 0; //TODO
+		double theta = state.getPosition()[2];
 		for(boolean on : controls){
 			if(on) {
 				F[0] += -Math.sin(theta) * F_thruster;
