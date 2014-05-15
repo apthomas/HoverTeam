@@ -1,11 +1,11 @@
+package HoverTeam;
 /**
  * HoverTeam
  * 16.35 Spring 2014 Final Project
  * @author Aaron Thomas and Matt Vernacchia
  */
-package HoverTeam;
+//package HoverTeam;
 
-import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
@@ -73,7 +73,7 @@ public class GameState implements Serializable {
 	}
 	private void clampPosition() {
 		x = Math.min(Math.max(x,0),100);	//calling 100= MAX_DOUBLE from SRS
-		y = Math.min(Math.max(y,0),10);
+		y = Math.min(Math.max(y,0),11);
 		theta = Math.min(Math.max(theta, -Math.PI), Math.PI);
 		if (theta - Math.PI == 0 || Math.abs(theta - Math.PI) < 1e-6)
 			theta = -Math.PI;
@@ -132,7 +132,7 @@ public class GameState implements Serializable {
 	 */
 	public void checkCollisions(){
 		// Get the vehicle perimeter shape
-		Path2D currentVehic = getVehicleShapePath(x,y);
+		Path2D currentVehic = getVehicleShapePath(x,y,1);
 
 		// Check collisions between the vehicle shape path and the obstacles 
 		for (int i=0; i<near_obst_heights.length;i++){
@@ -174,9 +174,9 @@ public class GameState implements Serializable {
 	 * the world reference frame.
 	 * @return
 	 */
-	public Path2D.Double getVehicleShapePath(double x, double y) {
-		double vehicWidth=Physics.length;
-		double vehicHeight= Physics.height;
+	public Path2D.Double getVehicleShapePath(double x, double y, int sF) {
+		double vehicWidth=Physics.length*sF;
+		double vehicHeight= Physics.height*sF;
 		/*
 		 * vehicle center is x,y
 		 * setting 
@@ -196,38 +196,15 @@ public class GameState implements Serializable {
 
 		bottomRight[0]=x+vehicWidth/2;
 		bottomRight[1]= y+vehicHeight/2;
-		/*
-		topLeft=computeCornerOfRect(topLeft[0], topLeft[1]);
-		topRight=computeCornerOfRect(topRight[0], topRight[1]);
-		bottomLeft=computeCornerOfRect(bottomLeft[0], bottomLeft[1]);
-		bottomRight=computeCornerOfRect(bottomRight[0], bottomRight[1]);
-
-		double[] xPoints=new double[4];
-		xPoints[0]=topLeft[0];
-		xPoints[1]=topRight[0];
-		xPoints[2] =bottomLeft[0];
-		xPoints[3] = bottomRight[0];
-
-		double[] yPoints = new double[4];
-		yPoints[0]=topLeft[1];
-		yPoints[1]=topRight[1];
-		yPoints[2] =bottomLeft[1];
-		yPoints[3] = bottomRight[1];
-		 */
-		// Make the non-rotated vehicle perimeter
-		Path2D.Double currentVehic = new Path2D.Double();
-		currentVehic.moveTo(topLeft[0], topLeft[1]);
-		currentVehic.lineTo(topRight[0], topRight[1]);
-		currentVehic.lineTo(bottomRight[0], bottomRight[1]);
-		currentVehic.lineTo(bottomLeft[0], bottomLeft[1]);
-		currentVehic.lineTo(topLeft[0], topLeft[1]);
-		currentVehic.closePath();
+		
+		Rectangle2D.Double currentVehic = new Rectangle2D.Double(bottomLeft[0], bottomLeft[1],vehicWidth, vehicHeight);
 		// Rotate the vehicle perimeter about its center
 		AffineTransform rotate = new AffineTransform();
+		//Rectangle2D rotatedVehic = AffineTransform.getRotateInstance(theta,x,y);
 		rotate.setToRotation(theta, x, y);
-		currentVehic.transform(rotate);
-
-		return currentVehic;
+		//currentVehic.setTransform(rotate);
+		Path2D.Double rotatedVehic = new Path2D.Double(currentVehic, rotate);
+		return rotatedVehic;
 	}
 	private double[] computeCornerOfRect(double xCorner, double yCorner){
 		double sinTheta=Math.sin(theta);

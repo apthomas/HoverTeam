@@ -107,7 +107,7 @@ public class TestGameState {
 		double[] pos = {0, 5, 0};
 		double[] vel = {0, 0, 0};
 		GameState state = new GameState(pos, vel, 0, 0, nearObstHeights, nearObstIndex);
-		Path2D.Double p = state.getVehicleShapePath(pos[0], pos[1]);
+		Path2D.Double p = state.getVehicleShapePath(pos[0], pos[1],1);
 		Rectangle2D bounds = p.getBounds2D();
 		assertEquals(pos[0]-Physics.length/2, bounds.getMinX(), 1e-6);
 		assertEquals(pos[0]+Physics.length/2, bounds.getMaxX(), 1e-6);
@@ -121,7 +121,7 @@ public class TestGameState {
 		double[] pos = {0, 5, Math.PI/2};
 		double[] vel = {0, 0, 0};
 		GameState state = new GameState(pos, vel, 0, 0, nearObstHeights, nearObstIndex);
-		Path2D.Double p = state.getVehicleShapePath(pos[0], pos[1]);
+		Path2D.Double p = state.getVehicleShapePath(pos[0], pos[1],1);
 		Rectangle2D bounds = p.getBounds2D();
 		assertEquals(pos[0]-Physics.height/2, bounds.getMinX(), 1e-6);
 		assertEquals(pos[0]+Physics.height/2, bounds.getMaxX(), 1e-6);
@@ -135,7 +135,7 @@ public class TestGameState {
 		double[] pos = {0, 5, 0};
 		double[] vel = {0, 0, 0};
 		GameState state = new GameState(pos, vel, 0, 0, nearObstHeights, nearObstIndex);
-		Path2D.Double p = state.getVehicleShapePath(pos[0], pos[1]);
+		Path2D.Double p = state.getVehicleShapePath(pos[0], pos[1],1);
 		Rectangle2D.Double a = new Rectangle2D.Double(0,0,1,10);
 		assertTrue(GameState.testIntersection(p, a));
 	}

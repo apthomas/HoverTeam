@@ -1,3 +1,4 @@
+package HoverTeam;
 /**
  * HoverTeam
 
@@ -5,8 +6,9 @@
  * 16.35 Spring 2014 Final Project
  * @author Aaron Thomas and Matt Vernacchia
  */
-package HoverTeam;
 
+
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Path2D;
@@ -23,38 +25,45 @@ public class Display extends JPanel implements Runnable{
 	 * The time in between redraws of the graphics [seconds]
 	 */
 	public final double updateTimeInterval=0.030;
-	public double sF=75;	//scale Factor
+	public double sF=60;	//scale Factor
 	public double heightError=100;
-
+	GameClient gc;
+	
 	public Display(){
-		System.out.println("completed constructor.");
+		
 	}
 	public void paintComponent(Graphics g){
-		System.out.println("currently painting.");
 		Graphics2D g2 = (Graphics2D) g;
 		/*
 		 * Testing with random GameState
-		 */
-		double[] pos = {28,6,Math.PI/8};
+		*/
+		double[] pos = {47,9,Math.PI/6};
 		double[] vel = {5,5,0};
 		int[] nearList = {4,8,7,5};
 		GameState gs = new GameState(pos,vel,2,2,nearList,3);
-
-		//GameState gs = GameClient.getGameState();
+		
+		//GameState gs = gc.getState();
 		/*
 		 * Drawing the vehicle in the center of the screen with regards to the x-coordinate and then referencing the walls to it.
 		 */
-		Path2D.Double vehic = gs.getVehicleShapePath(frameWidth/2, gs.getPosition()[1]);
+		g2.setColor(Color.red);
+		Path2D.Double vehic = gs.getVehicleShapePath(frameWidth/2, (10-gs.getPosition()[1])*sF,(int)sF);
 		g2.draw(vehic);
+		g2.fill(vehic);
 		int[] nearObstHeights = gs.getNearObstList();
 		double vehiclePast = gs.getPosition()[0]%5;	//distance that the vehicle is past the second obstacle--reference to where to draw obstacles
+		g2.setColor(Color.black);
 		for (int i =0; i<nearObstHeights.length;i++){
-			Rectangle2D.Double obstacle = new Rectangle2D.Double(frameWidth/2 -sF*vehiclePast+sF*5*(i-1),frameHeight-heightError,10,nearObstHeights[i]*sF);
+			Rectangle2D.Double obstacle = new Rectangle2D.Double(frameWidth/2 -sF*vehiclePast+sF*5*(i-1),frameHeight-nearObstHeights[i]*sF ,sF,nearObstHeights[i]*sF);
 			g2.draw(obstacle);
 			g2.fill(obstacle);
 		}
-		score = gs.getPosition()[0]/5;
-		g.drawString("Score:"+score, frameWidth/2, 100);
+		//frameHeight-heightError
+		score = Math.floor(gs.getPosition()[0]/5);
+		g.drawString("Score is:"+score, frameWidth/2, (int)heightError-50);
+	}
+	public void setGameClient(GameClient gc){
+		this.gc=gc;
 	}
 	public void run(){
 		/*
@@ -84,7 +93,6 @@ public class Display extends JPanel implements Runnable{
 		}
 
 	}
-	
 	public void setup() {
 		JFrame frame = new JFrame("Frame and Panel");
 		JLabel label= new JLabel("HoverTeam by Aaron Thomas and Matthew Vernacchia");
