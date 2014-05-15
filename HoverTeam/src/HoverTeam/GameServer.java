@@ -118,9 +118,11 @@ public class GameServer implements Runnable{
 			// We need to make more obstacles
 			all_obst.add(makeObstacle());
 			all_extent_x = (all_obst.size()-2)*GameState.obstacle_spacing;
+			/*
 			System.out.println(String.format(
 					"all_extent_x = %.2fm",
 					all_extent_x));
+					*/
 		}
 		int near_obst_start_i = 
 				(int) (Math.floor(currentX/GameState.obstacle_spacing)
@@ -184,6 +186,13 @@ public class GameServer implements Runnable{
 	}
 
 	public void run() {
+		String address = "??";
+		try {
+			address = GeneralInetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e1) {
+			e1.printStackTrace();
+		}
+		System.out.println("Server is up on IP addr "+address);
 		while(this.getState().getGameOutcome()) {
 			generateNearList(all_obst, this.getState().getPosition()[0]);
 			broadcastState();
