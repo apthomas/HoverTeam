@@ -35,10 +35,15 @@ public class GameClient implements Runnable {
 		} catch (UnknownHostException e1) {
 			e1.printStackTrace();
 		}
-		try {
-			controls_socket = new DatagramSocket(GameServerReceiver.controls_port_send);
-		} catch (SocketException e) {
-			e.printStackTrace();
+		int port = GameServerReceiver.controls_port_send;
+		while( controls_socket == null ) {
+			try {
+				controls_socket = new DatagramSocket(port);
+
+			} catch (SocketException e) {
+				e.printStackTrace();
+			}
+			port++;
 		}
 	}
 	/**
@@ -109,10 +114,10 @@ public class GameClient implements Runnable {
 
 	public static void main(String[] argv) throws IOException{
 		if (argv.length == 0) {
-	      System.err.println("Usage: GameClient <hostname>\n"+
-				 "where <hostname> is where GameServer is running");
-	      System.exit(-1);
-	    }
+			System.err.println("Usage: GameClient <hostname>\n"+
+					"where <hostname> is where GameServer is running");
+			System.exit(-1);
+		}
 		String host=argv[0];
 		// Make the GameClient
 		GameClient gc = new GameClient(host);
