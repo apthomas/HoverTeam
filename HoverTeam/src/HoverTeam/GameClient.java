@@ -9,14 +9,37 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 public class GameClient implements Runnable {
+	/**
+	 * The latest GameState (updated by GameClientReceiver).
+	 */
 	private GameState state;
+	/**
+	 * The socket for sending controls messages.
+	 */
+	private DatagramSocket controls_socket;
+	/**
+	 * The IP address of the GameServer machine.
+	 */
+	private InetAddress server_ip_addr;
 
 	public GameClient() {
-
+		try {
+			server_ip_addr = InetAddress.getByName("localhost");
+		} catch (UnknownHostException e1) {
+			e1.printStackTrace();
+		}
+		try {
+			controls_socket = new DatagramSocket(GameServerReceiver.controls_port_send);
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
 	}
 	/**
 	 * Convert a serialized data array into an Object.
@@ -47,21 +70,41 @@ public class GameClient implements Runnable {
 		return this.state;
 
 	}
-	
+
 	/**
 	 * This method is to be called by Display when the user presses a key to
 	 *  turn her/his thruster on.
 	 */
 	public void thrusterOn() {
 		System.out.println("Thruster ON");
+		// Make a controls packet.
+		byte[] data = {1};
+		DatagramPacket packet = new DatagramPacket(
+				data, data.length, server_ip_addr, GameServerReceiver.controls_port_rcv);
+		// Send the controls packet to the server.
+		try {
+			controls_socket.send(packet);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
-	
+
 	/**
 	 * This method is to be called by Display when the user presses a key to 
 	 * turn her/his thruster off.
 	 */
 	public void thrusterOff() {
 		System.out.println("Thruster OFF");
+		// Make a controls packet.
+		byte[] data = {0};
+		DatagramPacket packet = new DatagramPacket(
+				data, data.length, server_ip_addr, GameServerReceiver.controls_port_rcv);
+		// Send the controls packet to the server.
+		try {
+			controls_socket.send(packet);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void main(String[] argv) {
