@@ -11,10 +11,12 @@ package HoverTeam;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.AffineTransformOp;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -40,7 +42,7 @@ public class Display extends JPanel implements Runnable, KeyListener{
 		/*
 		 * Testing with random GameState
 		*/
-		double[] pos = {47,9,Math.PI/6};
+		double[] pos = {47,9,Math.PI/8};
 		double[] vel = {5,5,0};
 		int[] nearList = {4,8,7,5};
 		GameState gs = new GameState(pos,vel,2,2,nearList,3);
@@ -50,18 +52,22 @@ public class Display extends JPanel implements Runnable, KeyListener{
 		 * Drawing the vehicle in the center of the screen with regards to the x-coordinate and then referencing the walls to it.
 		 */
 		g2.setColor(Color.red);
-		Path2D.Double vehic = gs.getVehicleShapePath(frameWidth/2, (10-gs.getPosition()[1])*sF,(int)sF);
-		g2.draw(vehic);
-		g2.fill(vehic);
+		Path2D.Double vehic = gs.getVehicleShapePath(frameWidth/2, gs.getPosition()[1]*sF,(int)sF);
+		AffineTransform mirror = AffineTransform.getScaleInstance(1.0,-1.0);
+		mirror.translate(0, -frameHeight);
+		Path2D.Double transformedVehic = new Path2D.Double(vehic, mirror);
+		g2.draw(transformedVehic);
+		g2.fill(transformedVehic);
 		int[] nearObstHeights = gs.getNearObstList();
 		double vehiclePast = gs.getPosition()[0]%5;	//distance that the vehicle is past the second obstacle--reference to where to draw obstacles
 		g2.setColor(Color.black);
 		for (int i =0; i<nearObstHeights.length;i++){
-			Rectangle2D.Double obstacle = new Rectangle2D.Double(frameWidth/2 -sF*vehiclePast+sF*5*(i-1),frameHeight-nearObstHeights[i]*sF ,sF,nearObstHeights[i]*sF);
-			g2.draw(obstacle);
-			g2.fill(obstacle);
+			Rectangle2D.Double obstacle = new Rectangle2D.Double(frameWidth/2 -sF*vehiclePast+sF*5*(i-1),0 ,sF,nearObstHeights[i]*sF);
+			//frameHeight-nearObstHeights[i]*sF
+			Path2D.Double transformedObstacle = new Path2D.Double(obstacle, mirror);
+			g2.draw(transformedObstacle);
+			g2.fill(transformedObstacle);
 		}
-		//frameHeight-heightError
 		score = Math.floor(gs.getPosition()[0]/5);
 		g.drawString("Score is:"+score, frameWidth/2, (int)heightError-50);
 	}
