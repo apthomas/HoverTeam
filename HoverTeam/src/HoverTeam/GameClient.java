@@ -11,7 +11,7 @@ import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.MulticastSocket;
+import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
@@ -29,9 +29,9 @@ public class GameClient implements Runnable {
 	 */
 	private InetAddress server_ip_addr;
 
-	public GameClient() {
+	public GameClient(String host) {
 		try {
-			server_ip_addr = InetAddress.getByName("localhost");
+			server_ip_addr = InetAddress.getByName(host);
 		} catch (UnknownHostException e1) {
 			e1.printStackTrace();
 		}
@@ -107,9 +107,15 @@ public class GameClient implements Runnable {
 		}
 	}
 
-	public static void main(String[] argv) {
+	public static void main(String[] argv) throws IOException{
+		if (argv.length == 0) {
+	      System.err.println("Usage: GameClient <hostname>\n"+
+				 "where <hostname> is where GameServer is running");
+	      System.exit(-1);
+	    }
+		String host=argv[0];
 		// Make the GameClient
-		GameClient gc = new GameClient();
+		GameClient gc = new GameClient(host);
 		// Make the GameClientReceiver to get the GameState broadcasts.
 		GameClientReceiver gcr = new GameClientReceiver(gc);
 		// make the display
