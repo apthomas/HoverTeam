@@ -12,6 +12,7 @@ public class GameClientReceiver implements Runnable {
 	public GameClientReceiver(GameClient gc) {
 		this.gc = gc;
 	}
+	
 	public void run() {
 		try{
 			MulticastSocket socket = new MulticastSocket(GameServer.multicast_port_rcv);

@@ -27,7 +27,7 @@ public class Physics implements Runnable{
 	 * The vehicle mass [kilograms].
 	 */
 	public final double m = 1;
-	
+
 	/**
 	 * The acceleration due to gravity [meters/second^2].
 	 */
@@ -49,7 +49,7 @@ public class Physics implements Runnable{
 	 * The timestep between physics updates [seconds]
 	 */
 	public final double timestep = 1e-2;
-	
+
 	/**
 	 * Constructor.
 	 * @see Req 3.2.1.2
@@ -57,7 +57,7 @@ public class Physics implements Runnable{
 	public Physics( GameServer server ) {
 		this.server = server;
 	}
-	
+
 	/**
 	 * Updates the Game State. Control inputs are used to generate a system of
 	 * forces and torques on the vehicle, and these are used to update the physical 
@@ -84,7 +84,7 @@ public class Physics implements Runnable{
 		new_state.checkCollisions();
 		return state;
 	}	
-	
+
 	GameState dynamics(GameState state, double[] forces, double torque) {
 		double dt = state.getTime() - t_last;
 		// record the time for the last state update
@@ -103,12 +103,12 @@ public class Physics implements Runnable{
 		double ang_accel = torque / I;
 		vel[2] += ang_accel * dt;
 		pos[2] += vel[2] * dt;
-		
+
 		state.setPosition(pos);
 		state.setVelocity(vel);
 		return state;
 	}
-	
+
 	/**
 	 * Compute the forces on the vehicle exerted on the vehicle by
 	 * gravity and thrusters, given control input.
@@ -129,7 +129,7 @@ public class Physics implements Runnable{
 		F[1] += -g*m;
 		return F;
 	}
-	
+
 	/**
 	 * Compute the torque exerted on the vehicle by the thrusters,
 	 *  given a control input which indicates which thrusters are on.
@@ -147,7 +147,7 @@ public class Physics implements Runnable{
 		}
 		return torque;
 	}
-	
+
 	/**
 	 * get the positions of the thrusters on the vehicle, given how many thruster there are.
 	 * @param n The number of thrusters.
@@ -160,9 +160,15 @@ public class Physics implements Runnable{
 					"The number of thusters must be an integer greater than 0.");
 		}
 		double thruster_pos[][] = new double[n][2];
-		for(int i = 0; i < n; i++) {
-			thruster_pos[i][0] = (i-Math.floor(n/2))/(Math.floor(n/2)) * Physics.length/2;
-			thruster_pos[i][1] = -Physics.height/2;
+		if(n==1) {
+			thruster_pos[0][0] = 0;
+			thruster_pos[0][1] = -Physics.height/2;
+		}
+		else {
+			for(int i = 0; i < n; i++) {
+				thruster_pos[i][0] = (i-Math.floor(n/2))/(Math.floor(n/2)) * Physics.length/2;
+				thruster_pos[i][1] = -Physics.height/2;
+			}
 		}
 		return thruster_pos;
 	}
@@ -187,7 +193,7 @@ public class Physics implements Runnable{
 			state = updateState(state, controls);
 			// push the new GameState to the server
 			server.setState(state);
-			
+
 			// Sleep until the next cycle
 			double t_spent = (System.nanoTime()*1e-9 - t_start_abs) - t_cycle_start;
 			double t_sleep = timestep - t_spent;

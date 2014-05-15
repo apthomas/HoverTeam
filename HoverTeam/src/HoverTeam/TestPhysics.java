@@ -31,10 +31,26 @@ public class TestPhysics {
 	}
 	
 	@Test
-	public void test_getThrusterPositions() {
+	public void test_getThrusterPositions_5() {
 		double[][] thruster_pos = Physics.getThrusterPositions(5);
 		double[][] expected_pos = {{-0.5, -0.5}, {-0.25, -0.5}, {0, -0.5}, {0.25, -0.5}, {0.5, -0.5}};
 		for(int i = 0; i<5; i++) {
+			assertEquals(expected_pos[i][0], thruster_pos[i][0], 1e-6);
+		}
+	}
+	@Test
+	public void test_getThrusterPositions_1() {
+		double[][] thruster_pos = Physics.getThrusterPositions(1);
+		double[][] expected_pos = {{0, -0.5}};
+		for(int i = 0; i<1; i++) {
+			assertEquals(expected_pos[i][0], thruster_pos[i][0], 1e-6);
+		}
+	}
+	@Test
+	public void test_getThrusterPositions_2() {
+		double[][] thruster_pos = Physics.getThrusterPositions(2);
+		double[][] expected_pos = {{-0.5, -0.5}, {0.5, -0.5}};
+		for(int i = 0; i<1; i++) {
 			assertEquals(expected_pos[i][0], thruster_pos[i][0], 1e-6);
 		}
 	}
@@ -48,10 +64,34 @@ public class TestPhysics {
 		assertEquals(expected_forces[1], forces[1], 1e-6);
 	}
 	@Test
+	public void test_getForces_zero() {
+		boolean[] controls = {false, false};
+		double[] expected_forces = {0, - phys.g*phys.m};
+		double[] forces = phys.getForces(controls);
+		assertEquals(expected_forces[0], forces[0], 1e-6);
+		assertEquals(expected_forces[1], forces[1], 1e-6);
+	}
+	@Test
 	public void test_getTorque() {
 		boolean[] controls = {true, false, false};
 		double torque = phys.getTorque(controls);
 		double expected_torque = -phys.F_thruster*(Physics.length/2);
+		assertEquals(expected_torque, torque, 1e-6);
+	}
+	
+	@Test
+	public void test_getTorque_zero() {
+		boolean[] controls = {true};
+		double torque = phys.getTorque(controls);
+		double expected_torque = 0;
+		assertEquals(expected_torque, torque, 1e-6);
+	}
+	
+	@Test
+	public void test_getTorque_zero_multi() {
+		boolean[] controls = {true, false, true};
+		double torque = phys.getTorque(controls);
+		double expected_torque = 0;
 		assertEquals(expected_torque, torque, 1e-6);
 	}
 	
@@ -62,6 +102,21 @@ public class TestPhysics {
 		
 		GameState state = new GameState(zero_pos, zero_vel, 0.0, 1, obst, start_i);
 		GameState new_state = phys.dynamics(state, forces, torque);
+		
+		assertEquals(0, new_state.getVelocity()[0], 1e-6);
+		assertEquals(0, new_state.getVelocity()[1], 1e-6);
+		assertEquals(0, new_state.getVelocity()[2], 1e-6);
+		
+		assertEquals(0, new_state.getPosition()[0], 1e-6);
+		assertEquals(0, new_state.getPosition()[1], 1e-6);
+		assertEquals(0, new_state.getPosition()[2], 1e-6);
+	}
+	@Test
+	public void test_updateState_hover() {
+		boolean[] controls = {true};
+		
+		GameState state = new GameState(zero_pos, zero_vel, 0.0, 1, obst, start_i);
+		GameState new_state = phys.updateState(state, controls);
 		
 		assertEquals(0, new_state.getVelocity()[0], 1e-6);
 		assertEquals(0, new_state.getVelocity()[1], 1e-6);

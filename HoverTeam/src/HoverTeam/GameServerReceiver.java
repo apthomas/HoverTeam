@@ -96,11 +96,13 @@ public class GameServerReceiver  implements Runnable {
 				gs.setControls(controls_primitive);
 			}
 			// Print the received controls
+			/*
 			System.out.print("ServerRcv controls: [ ");
 			for(boolean b : controls) {
 				System.out.print(b + " ");
 			}
 			System.out.println("]");
+			*/
 		}
 	}
 

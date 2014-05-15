@@ -23,14 +23,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class Display extends JPanel implements Runnable, KeyListener{
-	public static final int frameWidth=1300;
-	public static final int frameHeight=700;
+	public static final int frameWidth=500;
+	public static final int frameHeight=200;
 	public double score;
 	/**
 	 * The time in between redraws of the graphics [seconds]
 	 */
 	public final double updateTimeInterval=0.030;
-	public double sF=60;	//scale Factor
+	public double sF=frameHeight/10.0;	//scale Factor
 	public double heightError=100;
 	GameClient gc;
 	
@@ -38,6 +38,7 @@ public class Display extends JPanel implements Runnable, KeyListener{
 		
 	}
 	public void paintComponent(Graphics g){
+		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
 		/*
 		 * Testing with random GameState
@@ -46,14 +47,29 @@ public class Display extends JPanel implements Runnable, KeyListener{
 		double[] vel = {5,5,0};
 		int[] nearList = {4,8,7,5};
 		GameState gs = new GameState(pos,vel,2,2,nearList,3);
-		if(gc != null) {
+		if(gc != null && gc.getState() != null) {
 			gs = gc.getState();
 		}
+		System.out.println(String.format(
+				"t=%3fs, x=%.3fm, y=%.3fm, theta=%.1fdeg",
+				gs.getTime(),
+				gs.getPosition()[0],
+				gs.getPosition()[1],
+				gs.getPosition()[2]*180.0/Math.PI ));
 		/*
 		 * Drawing the vehicle in the center of the screen with regards to the x-coordinate and then referencing the walls to it.
 		 */
 		g2.setColor(Color.red);
 		Path2D.Double vehic = gs.getVehicleShapePath(frameWidth/2, gs.getPosition()[1]*sF,(int)sF);
+		/*
+		Rectangle2D bounds_untrans = vehic.getBounds2D();
+		System.out.println(String.format(
+				"Display: bounding rect (untrans): x=%.1fpx, y=%.1fpx, w=%.1fpx, h=%.1fpx",
+				bounds_untrans.getCenterX(),
+				bounds_untrans.getCenterY(),
+				bounds_untrans.getWidth(),
+				bounds_untrans.getHeight()));
+				*/
 		AffineTransform mirror = AffineTransform.getScaleInstance(1.0,-1.0);
 		mirror.translate(0, -frameHeight);
 		Path2D.Double transformedVehic = new Path2D.Double(vehic, mirror);
@@ -83,7 +99,6 @@ public class Display extends JPanel implements Runnable, KeyListener{
 		double t_start_abs = System.nanoTime()*1e-9;
 		while (true){	
 			double t_cycle_start = System.nanoTime()*1e-9 - t_start_abs;
-			this.removeAll();
 			repaint();
 			//System.out.println("should have just repainted.");
 			// Sleep until the next cycle

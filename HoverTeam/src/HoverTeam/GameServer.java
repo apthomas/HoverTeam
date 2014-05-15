@@ -122,8 +122,7 @@ public class GameServer implements Runnable{
 	}
 
 	public void run() {
-		while(this.getState().getTime() < 10 
-				&& this.getState().getGameOutcome()) {
+		while(this.getState().getGameOutcome()) {
 			broadcastState();
 			/*
 			System.out.println(String.format(
@@ -131,7 +130,7 @@ public class GameServer implements Runnable{
 				this.getState().getTime(),
 				this.getState().getPosition()[0],
 				this.getState().getPosition()[1]));
-				*/
+			*/
 			try {
 				Thread.sleep(10);
 			} catch (InterruptedException e) {

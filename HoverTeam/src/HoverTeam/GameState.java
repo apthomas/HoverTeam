@@ -15,6 +15,7 @@ import java.io.Serializable;
 
 
 public class GameState implements Serializable {
+	private static final long serialVersionUID = -7380811253868690573L;
 	private double x, y, theta;	/*Shared resource*/
 	private double x_dot, y_dot, theta_dot;	/*Shared resource*/
 	private int n_players;
@@ -72,7 +73,7 @@ public class GameState implements Serializable {
 		clampPosition();
 	}
 	private void clampPosition() {
-		x = Math.min(Math.max(x,0),100);	//calling 100= MAX_DOUBLE from SRS
+		x = Math.min(Math.max(x,0),1e6);	//calling 1e6= MAX_DOUBLE from SRS
 		y = Math.min(Math.max(y,0),11);
 		theta = Math.min(Math.max(theta, -Math.PI), Math.PI);
 		if (theta - Math.PI == 0 || Math.abs(theta - Math.PI) < 1e-6)
