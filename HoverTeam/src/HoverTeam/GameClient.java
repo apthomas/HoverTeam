@@ -47,15 +47,39 @@ public class GameClient implements Runnable {
 		return this.state;
 
 	}
+	
+	/**
+	 * This method is to be called by Display when the user presses a key to
+	 *  turn her/his thruster on.
+	 */
+	public void thrusterOn() {
+		System.out.println("Thruster ON");
+	}
+	
+	/**
+	 * This method is to be called by Display when the user presses a key to 
+	 * turn her/his thruster off.
+	 */
+	public void thrusterOff() {
+		System.out.println("Thruster OFF");
+	}
 
 	public static void main(String[] argv) {
+		// Make the GameClient
 		GameClient gc = new GameClient();
+		// Make the GameClientReceiver to get the GameState broadcasts.
 		GameClientReceiver gcr = new GameClientReceiver(gc);
+		// make the display
+		Display disp = new Display();
+		disp.setGameClient(gc);
+		disp.setup();
 		// Start the Client-side threads
 		Thread gc_thread = new Thread(gc);
 		Thread gcr_thread = new Thread(gcr);
+		Thread disp_thread = new Thread(disp);
 		gc_thread.start();
 		gcr_thread.start();
+		disp_thread.start();
 		// Wait for the GameClient thread to finish
 		try {
 			gc_thread.join();
