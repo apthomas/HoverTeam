@@ -19,6 +19,7 @@ public class GameState implements Serializable {
 	private double x, y, theta;	/*Shared resource*/
 	private double x_dot, y_dot, theta_dot;	/*Shared resource*/
 	private int n_players;
+	private final double thrusterWidth = Physics.length*Display.sF/10;
 	/**
 	 * The time since the game start [seconds].
 	 */
@@ -112,10 +113,10 @@ public class GameState implements Serializable {
 	synchronized int[] getNearObstList(){
 		return near_obst_heights;
 	}
-	private void setNumPlayers(int new_num_players){
+	public void setNumPlayers(int new_num_players){
 		n_players= new_num_players;
 	}
-	private int getNumPlayers(){
+	public int getNumPlayers(){
 		return n_players;
 	}
 	public boolean getGameOutcome() {
@@ -194,6 +195,59 @@ public class GameState implements Serializable {
 		//currentVehic.setTransform(rotate);
 		Path2D.Double rotatedVehic = new Path2D.Double(currentVehic, rotate);
 		return rotatedVehic;
+	}
+	public Path2D.Double getVehicleBottomLine(double x, double y, int sF){
+		double vehicWidth=Physics.length*sF;
+		double vehicHeight= Physics.height*sF;
+		double[] bottomLeft = new double[2];
+		double[] bottomRight = new double[2];
+		bottomLeft[0]=x-vehicWidth/2;
+		bottomLeft[1]=y-vehicWidth/2;
+
+		bottomRight[0]=x+vehicWidth/2;
+		bottomRight[1]= y-vehicHeight/2;
+		Rectangle2D.Double bottomLine = new Rectangle2D.Double(bottomLeft[0], bottomLeft[1], vehicWidth, vehicHeight/5);
+		AffineTransform rotate = new AffineTransform();
+		//Rectangle2D rotatedVehic = AffineTransform.getRotateInstance(theta,x,y);
+		rotate.setToRotation(theta, x, y);
+		//currentVehic.setTransform(rotate);
+		Path2D.Double rotatedLine = new Path2D.Double(bottomLine, rotate);
+		return rotatedLine;
+	
+	}
+	public Path2D.Double[] getThrusterLocations(double x, double y, int sF){
+		Path2D.Double[] thrusters = new Path2D.Double[n_players];
+		double vehicWidth=Physics.length*sF;
+		double vehicHeight= Physics.height*sF;
+		double[] bottomLeft = new double[2];
+		double[] bottomRight = new double[2];
+		bottomLeft[0]=x-vehicWidth/2;
+		bottomLeft[1]=y-vehicWidth/2;
+
+		bottomRight[0]=x+vehicWidth/2;
+		bottomRight[1]= y-vehicHeight/2;
+		if (n_players<2){
+			Rectangle2D.Double thruster = new Rectangle2D.Double(bottomLeft[0]+vehicWidth/2, bottomLeft[1]-vehicHeight/5, thrusterWidth, vehicHeight/5);
+			AffineTransform rotate = new AffineTransform();
+			rotate.setToRotation(theta, x, y);
+			Path2D.Double rotatedThruster = new Path2D.Double(thruster, rotate);
+			thrusters[0] = rotatedThruster;
+			
+		}
+		else{
+			for (int i = 1;i<=thrusters.length;i++){
+				Rectangle2D.Double thruster = new Rectangle2D.Double(bottomLeft[0]+(vehicWidth-thrusterWidth)*(i-1)/(n_players-1), bottomLeft[1]-vehicHeight/5, thrusterWidth, vehicHeight/5);
+				AffineTransform rotate = new AffineTransform();
+				//Rectangle2D rotatedVehic = AffineTransform.getRotateInstance(theta,x,y);
+				rotate.setToRotation(theta, x, y);
+				//currentVehic.setTransform(rotate);
+				Path2D.Double rotatedThruster = new Path2D.Double(thruster, rotate);
+				thrusters[i-1] = rotatedThruster;
+			}
+		}
+		
+		return thrusters;
+		
 	}
 
 	/**
