@@ -5,6 +5,10 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
+/**
+ * This helper class handles the receipt of GameState messages from the GameServer.
+ * @see Req. 3.2.3.8
+ */
 public class GameClientReceiver implements Runnable {
 	public boolean on = true;
 	private GameClient gc;
