@@ -12,6 +12,9 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 
+/** This helper class handles the receipt of messages from the GameClients.
+ * @see Req. 3.2.2.11
+ */
 public class GameServerReceiver  implements Runnable {
 	/**
 	 * The IP addresses of the clients connected to the game.
