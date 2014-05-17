@@ -4,7 +4,6 @@ package HoverTeam;
  * 16.35 Spring 2014 Final Project
  * @author Aaron Thomas and Matt Vernacchia
  */
-//package HoverTeam;
 
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
@@ -16,17 +15,37 @@ import java.io.Serializable;
 
 public class GameState implements Serializable {
 	private static final long serialVersionUID = -7380811253868690573L;
+	/**
+	 * The vehicle's 3-DoF position in the 2D plane.
+	 * @see Req. 3.2.5.1.1
+	 */
 	private double x, y, theta;	/*Shared resource*/
+	/**
+	 * The vehicle's 3-DoF velocity in the 2D plane.
+	 * @see Req. 3.2.5.1.1
+	 */
 	private double x_dot, y_dot, theta_dot;	/*Shared resource*/
 	private int n_players;
+	/**
+	 * The number of clients in the game.
+	 * @see Req. 3.2.5.1.2
+	 */
 	private final double thrusterWidth = Physics.length*Display.sF/10;
 	/**
 	 * The time since the game start [seconds].
 	 */
 	private double t;
 
-	/* near obstacles list */
+	/**
+	 * The heights of the nearby obstacles.
+	 * @see Req. 3.2.5.1.3.1
+	 */
 	private int[] near_obst_heights;
+	/**
+	 * The starting index of near_obst_heights in the list of all obstacles.
+	 * near_obst_heights[i] = all_obst[i+near_obst_start_i + i] for all i in [0, near_obst_heights.length).
+	 * @see Req. 3.2.5.1.3.2
+	 */
 	private int near_obst_start_i;
 
 	//defaults to true and if we 
@@ -142,6 +161,7 @@ public class GameState implements Serializable {
 	/**
 	 * Checks if the vehicle is in collision with an obstacle.
 	 * If the vehicle is in collision, gameOutcome is set to false.
+	 * @see Req. 3.2.5.4
 	 */
 	public void checkCollisions(){
 		// Get the vehicle perimeter shape
@@ -185,7 +205,7 @@ public class GameState implements Serializable {
 	/**
 	 * Gets a Path2D which represents the perimeter of the vehicle in
 	 * the world reference frame.
-	 * @return
+	 * @return The vehicle perimeter int he world frame.
 	 */
 	public Path2D.Double getVehicleShapePath(double x, double y, int sF) {
 		double vehicWidth=Physics.length*sF;
