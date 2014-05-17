@@ -25,17 +25,38 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class Display extends JPanel implements Runnable, KeyListener{
+	/**
+	 * The size of the display window.
+	 * @see Req. 3.2.4.1.1
+	 */
 	public static final int frameWidth=500;
+	/**
+	 * The size of the display window.
+	 * @see Req. 3.2.4.1.1
+	 */
 	public static final int frameHeight=300;
 	public double score;
 	/**
-	 * The time in between redraws of the graphics [seconds]
+	 * The time in between redraws of the graphics [seconds].
 	 */
 	public final double updateTimeInterval=0.030;
+	/**
+	 * The scaling factor for the graphics.
+	 * @see Req. 3.2.4.1.1
+	 */
 	public static double sF = frameHeight/10.5;	//scale Factor
 	public double heightError=100;
 	protected String myHostName;
+	/**
+	 * The GameClient associated with this display.
+	 * @see Req 3.2.4.1.3
+	 */
 	GameClient gc;
+	
+	/**
+	 * Construtor
+	 * @see Req. 3.2.4.2
+	 */
 	public Display(){
 
 	}
@@ -43,6 +64,11 @@ public class Display extends JPanel implements Runnable, KeyListener{
 	public Display(String hostname){
 		myHostName=hostname;
 	}
+	
+	/**
+	 * Redraw the graphics
+	 * @see Req. 3.2.4.3
+	 */
 	public void paintComponent(Graphics g){
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
@@ -104,9 +130,19 @@ public class Display extends JPanel implements Runnable, KeyListener{
 		g.drawString("Green denotes thrusters",20,75);
 		g.drawString("Display running on "+myHostName, frameWidth-300,30);
 	}
+	
+	/**
+	 * Associate a GmaeClient with this display.
+	 * @see Req. 3.2.4.4
+	 */
 	public void setGameClient(GameClient gc){
 		this.gc=gc;
 	}
+	
+	/**
+	 * Execute the Display thread.
+	 * @see Req. 3.2.4.5
+	 */
 	public void run(){
 		/*
 		 * No maximum score, game goes on forever.
@@ -135,6 +171,10 @@ public class Display extends JPanel implements Runnable, KeyListener{
 		}
 
 	}
+	
+	/** Set up the graphics frame and labels
+	 * @see Req 3.2.4.8
+	 */
 	public void setup() {
 		JFrame frame = new JFrame("Frame and Panel");
 		JLabel label= new JLabel("HoverTeam by Aaron Thomas and Matthew Vernacchia");
@@ -148,6 +188,7 @@ public class Display extends JPanel implements Runnable, KeyListener{
 		 */
 		frame.addKeyListener(this);
 	}
+	
 	public static void main(String[] args){
 		/*
 		JFrame frame = new JFrame("Frame and Panel");
@@ -185,6 +226,10 @@ public class Display extends JPanel implements Runnable, KeyListener{
 
 	}
 
+	/**
+	 * Turn on the thruster when the space bar is pressed.
+	 * @see Req 3.2.4.6
+	 * */
 	@Override
 	public void keyPressed(KeyEvent e) {
 		int keyCode = e.getKeyCode();
@@ -196,6 +241,10 @@ public class Display extends JPanel implements Runnable, KeyListener{
 		}
 	}
 
+	/**
+	 * Turn off the thruster when the space bar is released.
+	 * @see Req 3.2.4.7
+	 * */
 	@Override
 	public void keyReleased(KeyEvent e) {
 		//System.out.println("key released");
