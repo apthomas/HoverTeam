@@ -18,6 +18,7 @@ import java.net.UnknownHostException;
 public class GameClient implements Runnable {
 	/**
 	 * The latest GameState (updated by GameClientReceiver).
+	 * @see Req. 3.2.3.1.1
 	 */
 	private GameState state;
 	/**
@@ -26,9 +27,15 @@ public class GameClient implements Runnable {
 	private DatagramSocket controls_socket;
 	/**
 	 * The IP address of the GameServer machine.
+	 * @see Req 3.2.3.1.2
 	 */
 	private InetAddress server_ip_addr;
 
+	/**
+	 * Constructor
+	 * @param host The IP address of the GameServer host machine
+	 * @see Req. 3.2.3.2
+	 */
 	public GameClient(String host) {
 		try {
 			server_ip_addr = InetAddress.getByName(host);
@@ -52,6 +59,7 @@ public class GameClient implements Runnable {
 	 * This method is used to decode that data into a GameState Object.
 	 * @param data
 	 * @return The data converted into a java Object.
+	 * @see Req. 3.2.3.3
 	 */
 	public static Object deserialize(byte[] data){
 		ByteArrayInputStream in = new ByteArrayInputStream(data);
@@ -64,13 +72,22 @@ public class GameClient implements Runnable {
 		}
 		return null;
 	}
-
+	
+	/**
+	 * Chnage the GameClient's GameState
+	 * @param state The new GameState
+	 * @see Req. 3.2.3.5
+	 */
 	public synchronized void setState(GameState state) {
 		if(state != null) {
 			this.state = state;
 		}
 	}
 
+	/**
+	 * Returns the current GameState
+	 * @see Req. 3.2.3.4
+	 */
 	public synchronized GameState getState() {
 		return this.state;
 
@@ -79,6 +96,7 @@ public class GameClient implements Runnable {
 	/**
 	 * This method is to be called by Display when the user presses a key to
 	 *  turn her/his thruster on.
+	 * @see Req. 3.2.3.6
 	 */
 	public void thrusterOn() {
 		System.out.println("Thruster ON");
@@ -97,6 +115,7 @@ public class GameClient implements Runnable {
 	/**
 	 * This method is to be called by Display when the user presses a key to 
 	 * turn her/his thruster off.
+	 * @see Req. 3.2.3.6
 	 */
 	public void thrusterOff() {
 		System.out.println("Thruster OFF");
@@ -149,7 +168,11 @@ public class GameClient implements Runnable {
 			e.printStackTrace();
 		}
 	}
-
+	
+	/**
+	 * Execute the GameClient Thread.
+	 * @see Req. 3.2.3.7
+	 */
 	@Override
 	public void run() {
 		while(true) {
